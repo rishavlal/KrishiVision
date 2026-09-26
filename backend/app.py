@@ -18,6 +18,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from ml.crop_recommendation.inference import predict_crop as predict_crop_model
 
 app = FastAPI(
     title="KrishiVision AI API",
@@ -81,100 +82,22 @@ class DiseaseDetectionResponse(BaseModel):
 # Core "model" — a transparent, rule-based simulation of a trained classifier.
 # Rules are ordered from most to least specific; the first matching rule wins.
 # ---------------------------------------------------------------------------
-def run_crop_model(x: SoilWeatherInput) -> PredictionResponse:
-    n, p, k = x.nitrogen, x.phosphorus, x.potassium
-    t, h, ph, r = x.temperature, x.humidity, x.ph, x.rainfall
-
-    if r > 200 and n > 80 and h > 70:
-        crop, conf, desc = (
-            "Rice", 96.0,
-            "High rainfall combined with strong nitrogen levels and humidity "
-            "creates ideal paddy-field conditions.",
-        )
-    elif h > 80 and r > 150 and t > 24:
-        crop, conf, desc = (
-            "Coconut", 94.5,
-            "High humidity and consistent warm rainfall closely match "
-            "coastal coconut-growing regions.",
-        )
-    elif 60 < r <= 150 and h > 75 and t > 24:
-        crop, conf, desc = (
-            "Banana", 91.0,
-            "Warm temperatures with steady rainfall and humidity favour "
-            "banana plantations.",
-        )
-    elif r < 100 and ph < 6.8 and 23 <= t <= 28:
-        crop, conf, desc = (
-            "Coffee", 93.0,
-            "Moderate temperature and slightly acidic soil are classic "
-            "conditions for Arabica/Robusta coffee.",
-        )
-    elif k > 55 and p > 55 and r < 90 and t > 22:
-        crop, conf, desc = (
-            "Cotton", 92.5,
-            "High potassium and phosphorus with low rainfall suit cotton's "
-            "deep-root, drought-tolerant growth.",
-        )
-    elif n > 55 and 80 <= r <= 160 and t > 24:
-        crop, conf, desc = (
-            "Maize", 90.0,
-            "Balanced nitrogen with moderate rainfall and warmth are ideal "
-            "for maize development.",
-        )
-    elif ph < 6.2 and r < 90 and 15 <= t <= 25:
-        crop, conf, desc = (
-            "Grapes", 88.5,
-            "Cooler temperatures, low rainfall, and slightly acidic soil "
-            "resemble vineyard conditions.",
-        )
-    elif t > 30 and h < 55 and r < 60:
-        crop, conf, desc = (
-            "Watermelon", 87.0,
-            "Hot, dry conditions with low rainfall are well suited to "
-            "melon crops.",
-        )
-    elif ph >= 6.5 and r < 80 and 20 <= t <= 30 and h < 60:
-        crop, conf, desc = (
-            "Pomegranate", 89.0,
-            "Warm, arid conditions with moderate soil pH suit drought-hardy "
-            "pomegranate orchards.",
-        )
-    elif r > 150 and h > 70 and t > 22:
-        crop, conf, desc = (
-            "Jute", 86.0,
-            "High rainfall and humidity are typical of jute-growing "
-            "floodplain regions.",
-        )
-    elif n < 40 and p > 40 and r < 100:
-        crop, conf, desc = (
-            "Chickpea", 85.5,
-            "Lower nitrogen requirement and modest rainfall favour "
-            "nitrogen-fixing chickpea.",
-        )
-    elif n < 45 and k < 40 and r < 90:
-        crop, conf, desc = (
-            "Lentil", 84.0,
-            "Low nitrogen and potassium demand with limited rainfall suit "
-            "lentil cultivation.",
-        )
-    elif 18 <= t <= 24 and h < 65 and r < 100:
-        crop, conf, desc = (
-            "Apple", 90.5,
-            "Cool temperatures and lower humidity match temperate orchard "
-            "conditions for apples.",
-        )
-    else:
-        crop, conf, desc = (
-            "Mixed Legumes", 78.0,
-            "Conditions are moderate across all parameters; a legume "
-            "rotation is a safe, soil-restoring choice.",
-        )
+def run_crop_model(x):
+    result = predict_crop_model(
+        nitrogen=x.nitrogen,
+        phosphorus=x.phosphorus,
+        potassium=x.potassium,
+        temperature=x.temperature,
+        humidity=x.humidity,
+        ph=x.ph,
+        rainfall=x.rainfall
+    )
 
     return PredictionResponse(
-        crop=crop,
-        confidence=conf,
-        description=desc,
-        timestamp=datetime.utcnow().isoformat() + "Z",
+        crop=result["crop"],
+        confidence=result["confidence"],
+        description="Recommendation generated using the trained Random Forest crop recommendation model.",
+        timestamp=datetime.utcnow().isoformat() + "Z"
     )
 
 
