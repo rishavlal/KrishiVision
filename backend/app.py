@@ -1,9 +1,8 @@
 """
 KrishiVision AI — Crop Recommendation Backend
 ===============================================
-Production-style FastAPI service that simulates an ML-driven crop
-recommendation engine using rule-based logic over soil (N-P-K, pH) and
-weather (temperature, humidity, rainfall) parameters.
+FastAPI service for crop recommendation using a trained
+Random Forest machine learning model with soil and weather parameters.
 
 Run locally:
     pip install fastapi uvicorn pydantic
@@ -22,7 +21,7 @@ from ml.crop_recommendation.inference import predict_crop as predict_crop_model
 
 app = FastAPI(
     title="KrishiVision AI API",
-    description="Rule-based crop recommendation and disease-detection service",
+    description="Crop recommendation service powered by a trained Random Forest model.",
     version="1.0.0",
 )
 
@@ -43,13 +42,36 @@ app.add_middleware(
 # Schemas
 # ---------------------------------------------------------------------------
 class SoilWeatherInput(BaseModel):
-    nitrogen: float = Field(..., ge=0, le=300, description="Nitrogen content (kg/ha)")
-    phosphorus: float = Field(..., ge=0, le=200, description="Phosphorus content (kg/ha)")
-    potassium: float = Field(..., ge=0, le=250, description="Potassium content (kg/ha)")
-    temperature: float = Field(..., ge=-10, le=55, description="Ambient temperature (°C)")
-    humidity: float = Field(..., ge=0, le=100, description="Relative humidity (%)")
-    ph: float = Field(..., ge=0, le=14, description="Soil pH")
-    rainfall: float = Field(..., ge=0, le=1000, description="Rainfall (mm)")
+    # Validation ranges are based on the observed ranges
+    # in the crop recommendation training dataset.
+    nitrogen: float = Field(
+        ..., ge=0, le=140,
+        description="Nitrogen content (dataset range: 0–140)"
+    )
+    phosphorus: float = Field(
+        ..., ge=5, le=145,
+        description="Phosphorus content (dataset range: 5–145)"
+    )
+    potassium: float = Field(
+        ..., ge=5, le=205,
+        description="Potassium content (dataset range: 5–205)"
+    )
+    temperature: float = Field(
+        ..., ge=8.83, le=43.68,
+        description="Temperature in °C (dataset range: 8.83–43.68)"
+    )
+    humidity: float = Field(
+        ..., ge=14.26, le=99.98,
+        description="Relative humidity in % (dataset range: 14.26–99.98)"
+    )
+    ph: float = Field(
+        ..., ge=3.50, le=9.94,
+        description="Soil pH (dataset range: 3.50–9.94)"
+    )
+    rainfall: float = Field(
+        ..., ge=20.21, le=298.56,
+        description="Rainfall in mm (dataset range: 20.21–298.56)"
+    )
 
     class Config:
         json_schema_extra = {
@@ -79,8 +101,7 @@ class DiseaseDetectionResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Core "model" — a transparent, rule-based simulation of a trained classifier.
-# Rules are ordered from most to least specific; the first matching rule wins.
+# Crop recommendation model
 # ---------------------------------------------------------------------------
 def run_crop_model(x):
     result = predict_crop_model(
