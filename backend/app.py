@@ -72,6 +72,11 @@ class SoilWeatherInput(BaseModel):
         ..., ge=20.21, le=298.56,
         description="Rainfall in mm (dataset range: 20.21–298.56)"
     )
+    location: Optional[str] = Field(
+        default=None,
+        max_length=100,
+        description="Application location/context"
+    )
 
     class Config:
         json_schema_extra = {
@@ -83,6 +88,7 @@ class SoilWeatherInput(BaseModel):
                 "humidity": 72,
                 "ph": 6.5,
                 "rainfall": 202,
+                "location": "Jamshedpur",
             }
         }
 
