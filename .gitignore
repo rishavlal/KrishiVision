@@ -5,3 +5,6 @@ __pycache__/
 *.log
 .vscode/
 .ipynb_checkpoints/
+
+backend/app_before_validation_edit.py
+ml/plant_disease/dataset.zip
