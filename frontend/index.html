@@ -3,549 +3,2566 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>कृषिVision AI — Smart Farming Dashboard</title>
+<title>कृषिVision — Intelligent Crop Recommendation and Plant Disease Detection</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- Google Font -->
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
 <!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-  :root{
-    --deep:#0b251e;
-    --deep-2:#0f3129;
-    --mint:#10b981;
-    --mint-dark:#059669;
-    --paper:#f8fafc;
+  :root {
+    --deep: #071f18;
+    --deep-2: #0c2b22;
+    --mint: #10b981;
+    --mint-dark: #059669;
+    --mint-light: #34d399;
+    --paper: #f8fafc;
+    --paper-card: rgba(255, 255, 255, 0.94);
   }
-  *{ font-family:'Inter', sans-serif; }
-  .hindi{ font-family:'Tiro Devanagari Hindi', serif; }
-  body{ background:var(--paper); }
+  * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  .hindi { font-family: 'Tiro Devanagari Hindi', 'Noto Sans Devanagari', 'Mangal', serif; }
+  body { background: #f8fafc; color: #0f172a; }
 
-  .glass{
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.6);
+  .glass {
+    background: var(--paper-card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .glass-dark{
-    background: rgba(11,37,30,0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.06);
+  .glass:hover {
+    border-color: rgba(16, 185, 129, 0.35);
   }
 
-  /* remove native number spinners so grid never breaks */
-  input[type=number]{
+  input[type=number] {
     -moz-appearance: textfield;
-    overflow: hidden;
   }
   input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button{
+  input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  .tab-panel{ display:none; }
-  .tab-panel.active{ display:block; animation: fadeUp .35s ease; }
-  @keyframes fadeUp{
-    from{ opacity:0; transform:translateY(6px); }
-    to{ opacity:1; transform:translateY(0); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp .25s ease-out; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .nav-item{
-    color: rgba(230,242,238,0.55);
-    transition: all .18s ease;
+  .nav-item {
+    color: rgba(230, 242, 238, 0.72);
+    transition: all .2s ease;
     border-left: 3px solid transparent;
   }
-  .nav-item:hover{ color:#fff; background:rgba(255,255,255,0.05); }
-  .nav-item.active{
-    color:#fff;
-    background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.02));
+  .nav-item:hover { color: #ffffff; background: rgba(255, 255, 255, 0.08); }
+  .nav-item.active {
+    color: #ffffff;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.26), rgba(16, 185, 129, 0.03));
     border-left: 3px solid var(--mint);
+    font-weight: 600;
   }
 
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
-  ::-webkit-scrollbar-track{ background:transparent; }
-
-  .drop-zone{
-    transition: all .2s ease;
+  .drop-zone {
+    transition: all .22s ease;
     border: 2px dashed #cbd5e1;
   }
-  .drop-zone.drag-over{
+  .drop-zone.drag-over {
     border-color: var(--mint);
-    background: rgba(16,185,129,0.06);
+    background: rgba(16, 185, 129, 0.08);
   }
 
-  .spinner{
-    width:18px;height:18px;border-radius:50%;
-    border:2.5px solid rgba(255,255,255,0.35);
-    border-top-color:#fff;
+  .spinner {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
     animation: spin .7s linear infinite;
+    display: inline-block;
   }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast Notification */
+  #toast-container {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 9999;
+    max-width: 440px;
+    width: calc(100% - 2.5rem);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .toast-item {
+    pointer-events: auto;
+    animation: toastSlide 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.12), 0 10px 10px rgba(0,0,0,0.06);
+  }
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
 
-<body class="text-slate-800">
+<body class="min-h-screen antialiased flex flex-col md:flex-row bg-slate-50 text-slate-800">
 
-<div class="flex min-h-screen">
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
 
-  <!-- ================= SIDEBAR ================= -->
-  <aside class="w-64 fixed inset-y-0 left-0 flex flex-col z-30" style="background:var(--deep);">
-    <div class="px-6 py-6 flex items-center gap-3 border-b border-white/5">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--mint),var(--mint-dark));">
-        <i data-lucide="leaf" class="text-white w-5 h-5"></i>
+  <!-- Mobile Top Header Bar (<768px screens) -->
+  <header class="md:hidden w-full flex items-center justify-between px-5 py-3.5 border-b border-emerald-950 shadow-md sticky top-0 z-50" style="background: var(--deep);">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-500/20 border border-emerald-400/30">
+        <img src="/assets/favicon.svg" alt="कृषिVision" class="w-5 h-5" />
       </div>
-      <div>
-        <p class="text-white font-bold text-lg leading-tight"><span class="hindi">कृषि</span><span style="color:var(--mint);">Vision</span></p>
-        <p class="text-[11px] tracking-wide text-emerald-100/40 -mt-0.5">AI Farming Suite</p>
+      <div class="text-left">
+        <span class="text-white font-extrabold text-lg leading-tight tracking-tight">
+          <span class="hindi">कृषि</span><span style="color:var(--mint);">Vision</span>
+        </span>
       </div>
     </div>
+    <button onclick="toggleMobileNav()" class="p-2 rounded-lg text-emerald-300 hover:text-white hover:bg-white/10 transition" aria-label="Toggle Navigation">
+      <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
+    </button>
+  </header>
 
-    <nav class="flex-1 px-3 py-5 space-y-1">
-      <button class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="dashboard">
-        <i data-lucide="layout-dashboard" class="w-4.5 h-4.5"></i> Dashboard
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-nav-drawer" class="hidden md:hidden fixed inset-x-0 top-[59px] bottom-0 z-40 p-5 overflow-y-auto" style="background: rgba(7, 31, 24, 0.98); backdrop-filter: blur(20px);">
+    <div class="flex flex-col space-y-2">
+      <a href="/" class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 hover:bg-white/10 transition">
+        <i data-lucide="home" class="w-5 h-5 text-emerald-400"></i> Home / Landing Page
+      </a>
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('dashboard'); toggleMobileNav();">
+        <i data-lucide="layout-dashboard" class="w-5 h-5 text-emerald-400"></i> Dashboard
       </button>
-      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="crop">
-        <i data-lucide="sprout" class="w-4.5 h-4.5"></i> Crop Recommendation
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('crop'); toggleMobileNav();">
+        <i data-lucide="sprout" class="w-5 h-5 text-emerald-400"></i> Crop Recommendation
       </button>
-      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="disease">
-        <i data-lucide="shield-alert" class="w-4.5 h-4.5"></i> Disease Detection
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('disease'); toggleMobileNav();">
+        <i data-lucide="scan-line" class="w-5 h-5 text-emerald-400"></i> Disease Detection
       </button>
-      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="history">
-        <i data-lucide="history" class="w-4.5 h-4.5"></i> History
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('history'); toggleMobileNav();">
+        <i data-lucide="history" class="w-5 h-5 text-emerald-400"></i> Prediction History
       </button>
-      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="analytics">
-        <i data-lucide="bar-chart-3" class="w-4.5 h-4.5"></i> Analytics
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('analytics'); toggleMobileNav();">
+        <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400"></i> Soil & Crop Analytics
       </button>
-      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium" data-tab="profile">
-        <i data-lucide="user-circle" class="w-4.5 h-4.5"></i> Profile
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('profile'); toggleMobileNav();">
+        <i data-lucide="user-check" class="w-5 h-5 text-emerald-400"></i> Farmer Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="w-full md:w-64 fixed md:inset-y-0 left-0 flex flex-col z-40 shadow-xl" style="background: var(--deep);">
+
+    <!-- Official कृषिVision Brand Header: Green Leaf Symbol ABOVE Project Name -->
+    <div class="px-6 py-6 flex flex-col items-center justify-center border-b border-white/10 text-center">
+      <div class="w-14 h-14 mb-2 flex items-center justify-center rounded-2xl shadow-lg relative group transition transform hover:scale-105"
+           style="background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1)); border: 1.5px solid rgba(52,211,153,0.4);">
+        <img src="/assets/favicon.svg" alt="कृषिVision Leaf Emblem" class="w-9 h-9 drop-shadow" />
+      </div>
+      <!-- Brand Name: कृषि in Hindi, Vision in English -->
+      <h1 class="text-white font-extrabold text-2xl tracking-tight leading-none mt-1">
+        <span class="hindi font-bold">कृषि</span><span style="color:var(--mint);">Vision</span>
+      </h1>
+      <p class="text-[10px] uppercase tracking-widest text-emerald-300/70 font-semibold mt-1">
+        Smarter Decisions · Better Farming
+      </p>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+      <a href="/" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-emerald-300 bg-emerald-950/40 border border-emerald-500/20 hover:bg-emerald-900/40 mb-2 transition">
+        <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i> Home / Landing Page
+      </a>
+      <button class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="dashboard">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="crop">
+        <i data-lucide="sprout" class="w-4 h-4"></i> Crop Recommendation
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="disease">
+        <i data-lucide="scan-line" class="w-4 h-4"></i> Disease Detection
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="history">
+        <i data-lucide="history" class="w-4 h-4"></i> Prediction History
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="analytics">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Soil & Crop Analytics
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="profile">
+        <i data-lucide="user-check" class="w-4 h-4"></i> Farmer Profile
       </button>
     </nav>
 
-    <div class="px-3 pb-5">
-      <button id="logout-btn" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-rose-300/70 hover:text-rose-200 hover:bg-white/5 transition">
-        <i data-lucide="log-out" class="w-4.5 h-4.5"></i> Logout
-      </button>
+    <!-- User & Auth Footer -->
+    <div class="px-4 py-4 border-t border-white/10">
+      <div id="auth-status-container" class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5 truncate cursor-pointer" onclick="showTab('profile')">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-bold text-xs" id="user-avatar-initials">
+            --
+          </div>
+          <div class="truncate text-left">
+            <p class="text-xs font-semibold text-white truncate" id="user-display-name">Loading...</p>
+            <p class="text-[10px] text-emerald-200/60 truncate" id="user-role-badge">Checking Auth</p>
+          </div>
+        </div>
+        <button id="auth-action-btn" onclick="openAuthModal()" class="text-xs px-2.5 py-1.5 rounded-lg font-medium text-emerald-300 hover:text-white hover:bg-white/10 transition">
+          Sign In
+        </button>
+      </div>
     </div>
   </aside>
 
-  <!-- ================= MAIN ================= -->
-  <main class="ml-64 flex-1 p-8 max-w-[1400px]">
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="md:ml-64 flex-1 p-5 md:p-8 max-w-[1440px]">
 
-    <!-- ---------- DASHBOARD ---------- -->
+    <!-- Notification Toast Banner -->
+    <div id="status-banner" class="hidden mb-6 rounded-xl p-4 flex items-center justify-between text-sm transition shadow-lg">
+      <div class="flex items-center gap-3" id="status-banner-content"></div>
+      <button onclick="dismissStatusBanner()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- ================= TAB 1: DASHBOARD ================= -->
     <section id="tab-dashboard" class="tab-panel active">
-      <div class="flex items-center justify-between mb-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Welcome back, Anil 👋</h1>
-          <p class="text-slate-500 text-sm mt-1">Here's what's happening across your farms today.</p>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span id="dash-greeting-text">Welcome to</span> <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> 👋
+          </h2>
+          <p class="text-slate-500 text-sm mt-1">Multi-parameter soil chemistry, meteorological telemetry, and foliar vision intelligence.</p>
         </div>
-        <div class="glass rounded-xl px-4 py-2.5 shadow-sm flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-sm font-medium text-slate-600">All systems operational</span>
+        <div class="flex items-center gap-3">
+          <div class="glass rounded-xl px-4 py-2 shadow-sm flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="backend-status-dot"></span>
+            <span class="text-xs font-semibold text-slate-700" id="dash-system-status">Connecting to Backend...</span>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-        <div class="glass rounded-2xl p-5 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center"><i data-lucide="scan-line" class="w-5 h-5 text-emerald-600"></i></div>
-            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12.4%</span>
+      <!-- Live KPI Metric Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="glass rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><i data-lucide="sprout" class="w-5 h-5"></i></div>
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-full">Database</span>
           </div>
-          <p class="text-3xl font-bold text-slate-900">1,284</p>
-          <p class="text-sm text-slate-500 mt-1">Total Predictions</p>
+          <p class="text-3xl font-extrabold text-slate-900" id="dash-kpi-predictions">--</p>
+          <p class="text-xs text-slate-500 mt-1 font-medium">Total Crop Predictions</p>
         </div>
-        <div class="glass rounded-2xl p-5 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center"><i data-lucide="activity" class="w-5 h-5 text-emerald-600"></i></div>
-            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Good</span>
+
+        <div class="glass rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600"><i data-lucide="activity" class="w-5 h-5"></i></div>
+            <span class="text-xs font-semibold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-full" id="dash-soil-badge">Dynamic</span>
           </div>
-          <p class="text-3xl font-bold text-slate-900">78%</p>
-          <p class="text-sm text-slate-500 mt-1">Avg. Soil Health Index</p>
+          <p class="text-3xl font-extrabold text-slate-900" id="dash-kpi-soil-health">--</p>
+          <p class="text-xs text-slate-500 mt-1 font-medium">Soil Health Index</p>
         </div>
-        <div class="glass rounded-2xl p-5 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center"><i data-lucide="bug" class="w-5 h-5 text-emerald-600"></i></div>
-            <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">3 new</span>
+
+        <div class="glass rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600"><i data-lucide="scan-line" class="w-5 h-5"></i></div>
+            <span class="text-xs font-semibold text-amber-700 bg-amber-100/60 px-2 py-0.5 rounded-full">Foliar</span>
           </div>
-          <p class="text-3xl font-bold text-slate-900">27</p>
-          <p class="text-sm text-slate-500 mt-1">Disease Scans This Week</p>
+          <p class="text-3xl font-extrabold text-slate-900" id="dash-kpi-disease-scans">--</p>
+          <p class="text-xs text-slate-500 mt-1 font-medium">Plant Disease Scans</p>
         </div>
-        <div class="glass rounded-2xl p-5 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center"><i data-lucide="server-cog" class="w-5 h-5 text-emerald-600"></i></div>
-            <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">99.9% up</span>
+
+        <div class="glass rounded-2xl p-5 shadow-lg border border-slate-100 hover:shadow-xl transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600"><i data-lucide="map-pin" class="w-5 h-5"></i></div>
+            <span class="text-xs font-semibold text-purple-700 bg-purple-100/60 px-2 py-0.5 rounded-full" id="dash-location-tag">Farm</span>
           </div>
-          <p class="text-3xl font-bold text-slate-900">Online</p>
-          <p class="text-sm text-slate-500 mt-1">System Status</p>
+          <p class="text-lg font-extrabold text-slate-900 truncate" id="dash-kpi-location">--</p>
+          <p class="text-xs text-slate-500 mt-1 font-medium" id="dash-kpi-holding">Landholding Size</p>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <button onclick="showTab('crop')" class="lg:col-span-2 text-left glass rounded-2xl p-6 shadow-xl hover:shadow-2xl transition group">
-          <div class="flex items-center justify-between">
+      <!-- Quick Action Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div onclick="showTab('crop')" class="glass rounded-2xl p-6 shadow-lg hover:shadow-2xl transition cursor-pointer border border-emerald-100 group relative overflow-hidden">
+          <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-125 transition"></div>
+          <div class="flex items-start justify-between">
             <div>
-              <h3 class="font-bold text-lg text-slate-900">Get a Crop Recommendation</h3>
-              <p class="text-sm text-slate-500 mt-1 max-w-md">Enter your soil NPK values and local weather to receive an instant, data-driven crop suggestion.</p>
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-md">Dual Pathway Decision</span>
+              <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-emerald-700 transition">Crop Recommendation</h3>
+              <p class="text-sm text-slate-500 mt-1.5 max-w-sm">Path A (With Soil Report) or Path B (Guided / No Soil Report). Powered by trained Random Forest.</p>
             </div>
-            <div class="w-12 h-12 rounded-full flex items-center justify-center bg-emerald-500 group-hover:scale-110 transition">
-              <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+            <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center group-hover:scale-110 transition shadow-md shadow-emerald-500/30">
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
             </div>
           </div>
-        </button>
-        <button onclick="showTab('disease')" class="text-left glass rounded-2xl p-6 shadow-xl hover:shadow-2xl transition group">
-          <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center mb-4"><i data-lucide="camera" class="w-5 h-5 text-emerald-600"></i></div>
-          <h3 class="font-bold text-slate-900">Scan a Leaf</h3>
-          <p class="text-sm text-slate-500 mt-1">Detect crop diseases from a photo.</p>
-        </button>
+        </div>
+
+        <div onclick="showTab('disease')" class="glass rounded-2xl p-6 shadow-lg hover:shadow-2xl transition cursor-pointer border border-teal-100 group relative overflow-hidden">
+          <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-teal-500/10 rounded-full blur-2xl group-hover:scale-125 transition"></div>
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-100/70 px-2.5 py-1 rounded-md">Deep Learning Vision</span>
+              <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-teal-700 transition">Plant Disease Detection</h3>
+              <p class="text-sm text-slate-500 mt-1.5 max-w-sm">Upload leaf photos to analyze foliar diseases across 27 conditions with organic, chemical, and cultural treatments.</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-teal-600 text-white flex items-center justify-center group-hover:scale-110 transition shadow-md shadow-teal-500/30">
+              <i data-lucide="camera" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Recent Farm Activity Feed -->
+      <div class="glass rounded-2xl p-6 shadow-lg border border-slate-100">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+            <i data-lucide="clock" class="w-5 h-5 text-emerald-600"></i> Recent Farm Predictions & Activity
+          </h3>
+          <button onclick="showTab('history')" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800">
+            View All History &rarr;
+          </button>
+        </div>
+        <div id="dash-recent-activity-container">
+          <!-- Dynamically populated from live SQLite database -->
+        </div>
       </div>
     </section>
 
-    <!-- ---------- CROP RECOMMENDATION ---------- -->
+    <!-- ================= TAB 2: CROP RECOMMENDATION ================= -->
     <section id="tab-crop" class="tab-panel">
-      <button onclick="showTab('dashboard')" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-lg mb-6 transition">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
-      </button>
+      <!-- Section Header -->
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> — Crop Recommendation
+          </h2>
+          <p class="text-slate-500 text-sm mt-0.5">Select the pathway matching your field data availability.</p>
+        </div>
+        <button onclick="showTab('dashboard')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white px-3 py-2 rounded-lg border border-slate-200 transition shadow-sm">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Dashboard
+        </button>
+      </div>
 
-      <div class="glass rounded-2xl p-7 shadow-xl mb-6">
-        <h1 class="text-2xl font-bold text-slate-900">Crop Recommendation</h1>
-        <p class="text-slate-500 text-sm mt-1 mb-6">Enter soil and weather parameters to get the best crop recommendation.</p>
+      <!-- Path Selection Wizard Switcher -->
+      <div class="glass rounded-2xl p-5 shadow-lg mb-8 border border-slate-100">
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Step 1: Do you have a laboratory soil test report?</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button id="btn-choice-path-a" onclick="switchCropPath('path-a')" class="text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/60 transition flex items-start gap-3.5 shadow-sm">
+            <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="file-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="font-bold text-slate-900 text-sm">Path A — Soil Report Available</p>
+              <p class="text-xs text-slate-500 mt-1">Full ML Random Forest prediction with Nitrogen (N), Phosphorus (P), Potassium (K), and Soil pH values.</p>
+            </div>
+          </button>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <button id="btn-choice-path-b" onclick="switchCropPath('path-b')" class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 bg-white transition flex items-start gap-3.5">
+            <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 mt-0.5" id="path-b-icon-box">
+              <i data-lucide="help-circle" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="font-bold text-slate-900 text-sm">Path B — No Soil Report Yet</p>
+              <p class="text-xs text-slate-500 mt-1">Guided preliminary agro-climatic suggestions based on your Location, Season, and Water availability.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ---------------- PATH A FORM ---------------- -->
+      <div id="container-path-a" class="glass rounded-2xl p-6 md:p-8 shadow-xl mb-8 border border-slate-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-slate-100 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Nitrogen — N (kg/ha)</label>
-            <input id="in-n" type="number" value="90" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full">Path A — Machine Learning Engine</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1">Enter Soil Chemistry & Meteorological Parameters</h3>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Phosphorus — P (kg/ha)</label>
-            <input id="in-p" type="number" value="42" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Potassium — K (kg/ha)</label>
-            <input id="in-k" type="number" value="43" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Temperature (°C)</label>
-            <input id="in-temp" type="number" step="0.1" value="28.5" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Humidity (%)</label>
-            <input id="in-humidity" type="number" step="0.1" value="72" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Soil pH</label>
-            <input id="in-ph" type="number" step="0.1" value="6.5" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div class="sm:col-span-2 lg:col-span-1">
-            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Rainfall (mm)</label>
-            <input id="in-rainfall" type="number" value="202" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
-          </div>
-          <div class="lg:col-span-2 flex items-end">
-            <button id="predict-btn" onclick="predictCrop()" class="w-full h-[42px] rounded-xl font-semibold text-white text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition hover:brightness-105" style="background:linear-gradient(90deg,var(--mint),var(--mint-dark));">
-              <i data-lucide="wand-sparkles" class="w-4 h-4" id="predict-icon"></i>
-              <span id="predict-label">Predict Crop</span>
+          <!-- Quick Preset Fill Toolbar -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-xs text-slate-400 font-medium">Quick Presets:</span>
+            <button type="button" onclick="loadSoilPreset('rice')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
+              🌾 Paddy/Rice
+            </button>
+            <button type="button" onclick="loadSoilPreset('maize')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 transition">
+              🌽 Maize
+            </button>
+            <button type="button" onclick="loadSoilPreset('chickpea')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
+              🌱 Chickpea
+            </button>
+            <button type="button" onclick="loadSoilPreset('cotton')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-800 hover:bg-indigo-100 border border-indigo-200 transition">
+              ☁️ Cotton
+            </button>
+            <button type="button" onclick="loadSoilPreset('coffee')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-orange-50 text-orange-800 hover:bg-orange-100 border border-orange-200 transition">
+              ☕ Coffee
+            </button>
+            <button type="button" onclick="loadSoilPreset('apple')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200 transition">
+              🍎 Apple
+            </button>
+            <button type="button" onclick="clearSoilForm()" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+              🧹 Clear
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Result -->
-      <div id="result-card" class="hidden glass rounded-2xl p-7 shadow-xl">
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6 items-center">
-          <div>
-            <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2 flex items-center gap-2">
-              <i data-lucide="badge-check" class="w-4 h-4"></i> Recommended Crop
-            </p>
-            <h2 id="result-crop" class="text-4xl font-extrabold text-slate-900 mb-3">Rice</h2>
-            <p id="result-desc" class="text-sm text-slate-500 mb-4 max-w-md">This crop suits the given nitrogen, rainfall and humidity profile well.</p>
-            <div class="flex items-center gap-3">
-              <div class="flex-1 h-2.5 rounded-full bg-slate-100 overflow-hidden">
-                <div id="confidence-bar" class="h-full rounded-full" style="width:94%;background:linear-gradient(90deg,var(--mint),var(--mint-dark));"></div>
+        <form id="form-path-a" onsubmit="event.preventDefault(); submitPathAPrediction();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Nitrogen — N (kg/ha) *</label>
+                <span id="badge-n" class="text-[10px] text-slate-400">0–140</span>
               </div>
-              <span id="confidence-text" class="text-sm font-bold text-emerald-700 whitespace-nowrap">94% confidence</span>
+              <input id="in-n" type="number" step="0.1" min="0" max="140" placeholder="e.g. 90" required oninput="updateNutrientBadge('n', this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Phosphorus — P (kg/ha) *</label>
+                <span id="badge-p" class="text-[10px] text-slate-400">5–145</span>
+              </div>
+              <input id="in-p" type="number" step="0.1" min="5" max="145" placeholder="e.g. 42" required oninput="updateNutrientBadge('p', this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Potassium — K (kg/ha) *</label>
+                <span id="badge-k" class="text-[10px] text-slate-400">5–205</span>
+              </div>
+              <input id="in-k" type="number" step="0.1" min="5" max="205" placeholder="e.g. 43" required oninput="updateNutrientBadge('k', this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Soil pH (0–14) *</label>
+                <span id="badge-ph" class="text-[10px] text-slate-400">3.5–10.0</span>
+              </div>
+              <input id="in-ph" type="number" step="0.01" min="3.5" max="10.0" placeholder="e.g. 6.5" required oninput="updateNutrientBadge('ph', this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Temperature (°C) *</label>
+              <input id="in-temp" type="number" step="0.1" min="8" max="50" placeholder="e.g. 28.5" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Relative Humidity (%) *</label>
+              <input id="in-humidity" type="number" step="0.1" min="10" max="100" placeholder="e.g. 72" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
+            </div>
+
+            <div class="sm:col-span-2 lg:col-span-2">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Seasonal Rainfall (mm) *</label>
+              <input id="in-rainfall" type="number" step="0.1" min="20" max="350" placeholder="e.g. 202" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm outline-none">
             </div>
           </div>
-          <img id="result-img" src="" alt="Crop preview" class="w-full h-44 object-cover rounded-xl shadow-md">
+
+          <!-- Optional Context Fields -->
+          <div class="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-medium text-slate-500">Farm Location (Optional)</label>
+                <button type="button" onclick="autoFillClimateFromLocation()" class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold hover:bg-emerald-100 transition">Autofill Climate</button>
+              </div>
+              <input id="in-loc-a" type="text" placeholder="e.g. Ranchi, Jharkhand" class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Growing Season (Optional)</label>
+              <select id="in-season-a" class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white">
+                <option value="Kharif">Kharif (Monsoon: Jun – Oct)</option>
+                <option value="Rabi">Rabi (Winter: Oct – Mar)</option>
+                <option value="Zaid">Zaid (Summer: Mar – Jun)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Soil Texture (Optional)</label>
+              <select id="in-soil-a" class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white">
+                <option value="Loamy">Loamy Soil</option>
+                <option value="Clay">Clay Soil</option>
+                <option value="Sandy Loam">Sandy Loam</option>
+                <option value="Black">Black Soil</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="btn-predict-path-a" type="submit" class="w-full py-3.5 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+            <i data-lucide="wand-sparkles" class="w-4 h-4" id="icon-predict-a"></i>
+            <span id="label-predict-a">Run Random Forest Inference</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- ---------------- PATH B FORM ---------------- -->
+      <div id="container-path-b" class="hidden glass rounded-2xl p-6 md:p-8 shadow-xl mb-8 border border-slate-100">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+          <div>
+            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Path B — Preliminary Guidance Engine</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1">Provide Regional & Agro-Climatic Observations</h3>
+          </div>
+          <span class="text-xs text-amber-700 font-medium">Non-ML Rule System</span>
         </div>
+
+        <form id="form-path-b" onsubmit="event.preventDefault(); submitPathBGuidance();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">State / Province *</label>
+              <select id="in-loc-b" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white">
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Bihar">Bihar</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Odisha">Odisha</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Assam">Assam</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Growing Season *</label>
+              <select id="in-season-b" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white">
+                <option value="Kharif">Kharif (Monsoon: Jun – Oct)</option>
+                <option value="Rabi">Rabi (Winter: Oct – Mar)</option>
+                <option value="Zaid">Zaid (Summer: Mar – Jun)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Water Availability *</label>
+              <select id="in-water-b" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white">
+                <option value="Moderate">Moderate (Average rainfall / canal)</option>
+                <option value="High">High (Abundant water / flooding)</option>
+                <option value="Low">Low (Drought prone / limited)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Irrigation System Available? *</label>
+              <select id="in-irrigation-b" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white">
+                <option value="true">Yes (Borewell / Tube-well / Drip)</option>
+                <option value="false">No (Purely Rainfed)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Known Soil Texture (Optional)</label>
+              <select id="in-soil-b" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white">
+                <option value="Loamy">Loamy Soil</option>
+                <option value="Clay">Clay Soil</option>
+                <option value="Sandy Loam">Sandy Loam</option>
+                <option value="Clay Loam">Clay Loam</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Previous Crop in Field (Optional)</label>
+              <input id="in-prev-crop-b" type="text" placeholder="e.g. Rice, Wheat" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-amber-50 border border-amber-200/80 mb-6 flex items-start gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+            <p class="text-xs text-amber-800 leading-relaxed">
+              <strong>Advisory Note:</strong> This path generates rule-based agronomic recommendations. It does not calculate ML model scores. For precise soil-grounded recommendations, obtain a Soil Health Card with N-P-K readings and use Path A.
+            </p>
+          </div>
+
+          <button id="btn-predict-path-b" type="submit" class="w-full py-3.5 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, #d97706, #b45309);">
+            <i data-lucide="compass" class="w-4 h-4" id="icon-predict-b"></i>
+            <span id="label-predict-b">Generate Agro-Climatic Guidance</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Card (Dynamic Output) -->
+      <div id="crop-result-card" class="hidden glass rounded-2xl p-7 shadow-2xl border border-emerald-100">
+        <div id="crop-result-inner"></div>
       </div>
     </section>
 
-    <!-- ---------- DISEASE DETECTION ---------- -->
+    <!-- ================= TAB 3: PLANT DISEASE DETECTION ================= -->
     <section id="tab-disease" class="tab-panel">
-      <h1 class="text-2xl font-bold text-slate-900 mb-1">Disease Detection</h1>
-      <p class="text-slate-500 text-sm mb-6">Upload a photo of a leaf to check for common crop diseases.</p>
+      <!-- Section Header -->
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> — Plant Disease Diagnostics
+          </h2>
+          <p class="text-slate-500 text-sm mt-0.5">Foliar convolutional neural network inspection across 27 conditions.</p>
+        </div>
+        <button onclick="showTab('dashboard')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white px-3 py-2 rounded-lg border border-slate-200 transition shadow-sm">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Dashboard
+        </button>
+      </div>
 
-      <div class="glass rounded-2xl p-7 shadow-xl">
-        <div id="drop-zone" class="drop-zone rounded-2xl py-16 flex flex-col items-center justify-center text-center cursor-pointer">
-          <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
-            <i data-lucide="image-up" class="w-6 h-6 text-emerald-600"></i>
+      <!-- Upload Drop Zone -->
+      <div class="glass rounded-2xl p-7 shadow-xl mb-8 border border-slate-100">
+        <div id="drop-zone" class="drop-zone rounded-2xl py-14 px-6 flex flex-col items-center justify-center text-center cursor-pointer bg-white/40">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-sm">
+            <i data-lucide="image-plus" class="w-8 h-8"></i>
           </div>
-          <p class="font-semibold text-slate-700">Drag & drop a leaf image here</p>
-          <p class="text-sm text-slate-400 mt-1">or click to browse — JPG, PNG up to 10MB</p>
-          <input type="file" id="file-input" accept="image/*" class="hidden">
+          <p class="font-bold text-slate-800 text-base">Drag & drop your crop leaf photograph here</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm">Supports high-resolution JPEG, PNG, or WEBP foliar close-ups (up to 10 MB)</p>
+          <input type="file" id="leaf-file-input" accept="image/*" class="hidden">
+          <button type="button" onclick="document.getElementById('leaf-file-input').click()" class="mt-4 px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 font-semibold text-xs hover:bg-emerald-100 transition">
+            Browse From Device
+          </button>
         </div>
 
-        <div id="disease-preview" class="hidden mt-6 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 items-center">
-          <img id="preview-img" class="w-full h-40 object-cover rounded-xl shadow-md" />
-          <div>
-            <p class="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-2">Analysis Result (demo)</p>
-            <h3 class="text-xl font-bold text-slate-900 mb-1">Early Blight — Detected</h3>
-            <p class="text-sm text-slate-500 mb-3">Dark concentric spots on lower leaves suggest early blight. Apply a copper-based fungicide and improve airflow between plants.</p>
-            <span class="text-xs font-bold bg-amber-50 text-amber-700 px-3 py-1 rounded-full">87% confidence</span>
+        <!-- Instant Foliar Samples for 1-Click Evaluation -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-emerald-600"></i> Instant Benchmark Leaves:
+            </span>
           </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="loadSampleLeaf('tomato')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition flex items-center gap-1.5 shadow-sm">
+              🍅 Tomato Early Blight Sample
+            </button>
+            <button type="button" onclick="loadSampleLeaf('potato')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
+              🥔 Potato Late Blight Sample
+            </button>
+            <button type="button" onclick="loadSampleLeaf('corn')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+              🌽 Corn Healthy Foliage Sample
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected File Preview & Inspection Action -->
+        <div id="disease-selected-box" class="hidden mt-6 p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <img id="leaf-preview-img" class="w-24 h-24 object-cover rounded-xl shadow-md border border-white" />
+            <div>
+              <p class="font-bold text-slate-900 text-sm" id="leaf-preview-name">leaf_sample.jpg</p>
+              <p class="text-xs text-slate-500 mt-0.5" id="leaf-preview-size">Ready for 224x224 RGB tensor preprocessing</p>
+            </div>
+          </div>
+          <button id="btn-analyze-leaf" onclick="submitDiseaseDetection()" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+            <i data-lucide="scan" class="w-4 h-4" id="icon-analyze-leaf"></i>
+            <span id="label-analyze-leaf">Diagnose Foliage</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Disease Diagnostic Result -->
+      <div id="disease-result-container" class="hidden mb-8"></div>
+
+      <!-- Comprehensive 27-Class Agricultural Encyclopedia -->
+      <div class="glass rounded-2xl p-7 shadow-xl border border-slate-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Plant Disease Treatment Encyclopedia</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Explore symptoms, organic remedies, and chemical fungicides across 27 conditions.</p>
+          </div>
+          <!-- Species filter buttons -->
+          <div class="flex items-center gap-1.5 flex-wrap" id="species-filter-container">
+            <button onclick="filterEncyclopedia('all')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white">All Species</button>
+            <button onclick="filterEncyclopedia('Tomato')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Tomato</button>
+            <button onclick="filterEncyclopedia('Potato')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Potato</button>
+            <button onclick="filterEncyclopedia('Corn')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Corn</button>
+            <button onclick="filterEncyclopedia('Apple')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Apple</button>
+            <button onclick="filterEncyclopedia('Grape')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Grape</button>
+            <button onclick="filterEncyclopedia('Pepper')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Pepper</button>
+          </div>
+        </div>
+
+        <div id="encyclopedia-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated dynamically via JS -->
         </div>
       </div>
     </section>
 
-    <!-- ---------- HISTORY ---------- -->
+    <!-- ================= TAB 4: PREDICTION HISTORY ================= -->
     <section id="tab-history" class="tab-panel">
-      <h1 class="text-2xl font-bold text-slate-900 mb-1">Prediction History</h1>
-      <p class="text-slate-500 text-sm mb-6">Your last 5 crop recommendation requests.</p>
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> — Prediction History
+          </h2>
+          <p class="text-slate-500 text-sm mt-0.5">Database records of your past crop recommendations and disease scans.</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="exportHistoryCSV()" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+          </button>
+          <button onclick="loadHistoryData()" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+          </button>
+        </div>
+      </div>
 
-      <div class="glass rounded-2xl shadow-xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-slate-500 border-b border-slate-200/70">
-              <th class="px-6 py-3.5 font-semibold">Date</th>
-              <th class="px-6 py-3.5 font-semibold">N-P-K</th>
-              <th class="px-6 py-3.5 font-semibold">Rainfall</th>
-              <th class="px-6 py-3.5 font-semibold">Predicted Crop</th>
-              <th class="px-6 py-3.5 font-semibold">Confidence</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr class="hover:bg-emerald-50/40 transition">
-              <td class="px-6 py-3.5 text-slate-600">Sep 10, 2026</td>
-              <td class="px-6 py-3.5 text-slate-600">90-42-43</td>
-              <td class="px-6 py-3.5 text-slate-600">202 mm</td>
-              <td class="px-6 py-3.5 font-semibold text-slate-800">Rice</td>
-              <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-bold">94%</span></td>
-            </tr>
-            <tr class="hover:bg-emerald-50/40 transition">
-              <td class="px-6 py-3.5 text-slate-600">Sep 08, 2026</td>
-              <td class="px-6 py-3.5 text-slate-600">40-60-20</td>
-              <td class="px-6 py-3.5 text-slate-600">65 mm</td>
-              <td class="px-6 py-3.5 font-semibold text-slate-800">Coffee</td>
-              <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-bold">91%</span></td>
-            </tr>
-            <tr class="hover:bg-emerald-50/40 transition">
-              <td class="px-6 py-3.5 text-slate-600">Sep 05, 2026</td>
-              <td class="px-6 py-3.5 text-slate-600">80-25-30</td>
-              <td class="px-6 py-3.5 text-slate-600">95 mm</td>
-              <td class="px-6 py-3.5 font-semibold text-slate-800">Maize</td>
-              <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-bold">89%</span></td>
-            </tr>
-            <tr class="hover:bg-emerald-50/40 transition">
-              <td class="px-6 py-3.5 text-slate-600">Sep 02, 2026</td>
-              <td class="px-6 py-3.5 text-slate-600">20-70-45</td>
-              <td class="px-6 py-3.5 text-slate-600">55 mm</td>
-              <td class="px-6 py-3.5 font-semibold text-slate-800">Cotton</td>
-              <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-bold">93%</span></td>
-            </tr>
-            <tr class="hover:bg-emerald-50/40 transition">
-              <td class="px-6 py-3.5 text-slate-600">Aug 29, 2026</td>
-              <td class="px-6 py-3.5 text-slate-600">10-15-18</td>
-              <td class="px-6 py-3.5 text-slate-600">120 mm</td>
-              <td class="px-6 py-3.5 font-semibold text-slate-800">Grapes</td>
-              <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-bold">88%</span></td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- History Search and Filter Controls -->
+      <div class="glass rounded-2xl p-4 shadow-sm mb-4 border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-72">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          <input id="history-search-input" type="text" placeholder="Search crops, diseases, dates..." oninput="filterHistoryTable()" class="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-emerald-500 bg-white">
+        </div>
+        <div class="flex items-center gap-1.5 w-full sm:w-auto" id="history-type-filters">
+          <button onclick="setHistoryFilter('all')" class="px-3 py-1 rounded-md text-xs font-semibold bg-emerald-600 text-white">All Records</button>
+          <button onclick="setHistoryFilter('crop')" class="px-3 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Crops</button>
+          <button onclick="setHistoryFilter('disease')" class="px-3 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">Diseases</button>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="text-slate-500 bg-slate-50/70 border-b border-slate-200 text-xs uppercase tracking-wider font-semibold">
+                <th class="px-6 py-4">Date & Time</th>
+                <th class="px-6 py-4">Category</th>
+                <th class="px-6 py-4">Field Inputs / Species</th>
+                <th class="px-6 py-4">Recommendation</th>
+                <th class="px-6 py-4">Model score</th>
+                <th class="px-6 py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-slate-100">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <!-- ---------- ANALYTICS ---------- -->
+    <!-- ================= TAB 5: ANALYTICS ================= -->
     <section id="tab-analytics" class="tab-panel">
-      <h1 class="text-2xl font-bold text-slate-900 mb-1">Analytics</h1>
-      <p class="text-slate-500 text-sm mb-6">Trends across your soil health and predictions.</p>
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> — Soil & Crop Analytics
+          </h2>
+          <p class="text-slate-500 text-sm mt-0.5">Real-time agricultural telemetry and prediction trends computed from your database.</p>
+        </div>
+        <button onclick="loadAnalyticsData()" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Data
+        </button>
+      </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="glass rounded-2xl p-6 shadow-xl h-64 flex flex-col">
-          <p class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i> Predictions Over Time</p>
-          <div class="flex-1 rounded-xl border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-sm bg-slate-50/50">
-            Chart renders here once connected to live data
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Crop Distribution Chart Card -->
+        <div class="glass rounded-2xl p-6 shadow-xl border border-slate-100">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> Recommended Crop Distribution
+            </h3>
+            <span class="text-xs text-slate-400" id="analytics-crop-records-count">Live Database</span>
+          </div>
+          <div id="crop-dist-chart" class="space-y-3 pt-2">
+            <!-- Dynamically populated SVG horizontal bars -->
           </div>
         </div>
-        <div class="glass rounded-2xl p-6 shadow-xl h-64 flex flex-col">
-          <p class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> Crop Distribution</p>
-          <div class="flex-1 rounded-xl border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-sm bg-slate-50/50">
-            Chart renders here once connected to live data
+
+        <!-- Soil Nutrient Profile Card -->
+        <div class="glass rounded-2xl p-6 shadow-xl border border-slate-100">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i data-lucide="gauge" class="w-4 h-4 text-emerald-600"></i> Field Soil Nutrient Averages
+            </h3>
+            <span class="text-xs text-slate-400">Benchmark Comparison</span>
           </div>
-        </div>
-        <div class="glass rounded-2xl p-6 shadow-xl h-64 flex flex-col lg:col-span-2">
-          <p class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i data-lucide="gauge" class="w-4 h-4 text-emerald-600"></i> Soil Nutrient Trends (N-P-K)</p>
-          <div class="flex-1 rounded-xl border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-sm bg-slate-50/50">
-            Chart renders here once connected to live data
+          <div id="soil-averages-bars" class="space-y-4 pt-2">
+            <!-- Dynamically populated nutrient comparison bars -->
           </div>
         </div>
       </div>
+
+      <!-- Soil Health Index & Dynamic Advisory -->
+      <div class="glass rounded-2xl p-6 shadow-xl border border-slate-100">
+        <h3 class="font-bold text-slate-900 text-base mb-2 flex items-center gap-2">
+          <i data-lucide="leaf" class="w-4 h-4 text-emerald-600"></i> Integrated Farm Health Diagnostic
+        </h3>
+        <p class="text-sm text-slate-600 leading-relaxed" id="analytics-farm-summary">
+          <!-- Dynamically generated narrative based on real average soil inputs -->
+        </p>
+      </div>
     </section>
 
-    <!-- ---------- PROFILE ---------- -->
+    <!-- ================= TAB 6: FARMER PROFILE ================= -->
     <section id="tab-profile" class="tab-panel">
-      <h1 class="text-2xl font-bold text-slate-900 mb-6">Profile</h1>
-      <div class="glass rounded-2xl p-8 shadow-xl max-w-xl">
-        <div class="flex items-center gap-5 mb-6">
-          <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-xl font-bold" style="background:linear-gradient(135deg,var(--mint),var(--mint-dark));">AK</div>
-          <div>
-            <p class="text-lg font-bold text-slate-900">Anil Kumar</p>
-            <p class="text-sm text-slate-500">Farm Owner · Bihar, India</p>
+      <div class="mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+          <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> — Farmer Profile
+        </h2>
+        <p class="text-slate-500 text-sm mt-0.5">Manage your agricultural landholding, location, and farm credentials.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Profile Identity Card -->
+        <div class="glass rounded-2xl p-6 shadow-xl border border-slate-100 flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-emerald-600/30 mb-4" style="background: linear-gradient(135deg, var(--mint), var(--mint-dark));" id="profile-card-avatar">
+            --
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900" id="profile-card-name">Guest Farmer</h3>
+          <p class="text-xs text-slate-500 mt-1" id="profile-card-location">Not Signed In</p>
+          <span class="inline-block mt-3 text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full" id="profile-card-tag">Guest Mode</span>
+
+          <div class="w-full mt-6 pt-6 border-t border-slate-100 text-left space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Username:</span>
+              <span class="font-semibold text-slate-800" id="profile-view-username">--</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Email:</span>
+              <span class="font-semibold text-slate-800 truncate max-w-[140px]" id="profile-view-email">--</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Phone:</span>
+              <span class="font-semibold text-slate-800" id="profile-view-phone">--</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Past Analyses:</span>
+              <span class="font-semibold text-emerald-700" id="profile-view-predictions">--</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Member Since:</span>
+              <span class="font-semibold text-slate-800" id="profile-view-member-since">--</span>
+            </div>
+          </div>
+
+          <div class="w-full mt-6 space-y-2">
+            <button onclick="openAuthModal()" class="w-full py-2.5 rounded-xl font-bold text-white text-xs shadow-md transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+              Switch / Sign In
+            </button>
+            <button id="btn-logout" onclick="logoutFarmer()" class="hidden w-full py-2 rounded-xl font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 text-xs transition">
+              Sign Out
+            </button>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-5 text-sm">
-          <div>
-            <p class="text-slate-400 text-xs font-semibold mb-1">Email</p>
-            <p class="text-slate-700 font-medium">anil.kumar@krishivision.ai</p>
+
+        <!-- Live Profile Edit Form -->
+        <div class="lg:col-span-2 glass rounded-2xl p-7 shadow-xl border border-slate-100">
+          <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Edit Farm Information</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Update your details in the SQLite database.</p>
+            </div>
+            <span class="text-xs text-slate-400">Live Database Update</span>
           </div>
-          <div>
-            <p class="text-slate-400 text-xs font-semibold mb-1">Phone</p>
-            <p class="text-slate-700 font-medium">+91 98765 43210</p>
-          </div>
-          <div>
-            <p class="text-slate-400 text-xs font-semibold mb-1">Farm Size</p>
-            <p class="text-slate-700 font-medium">4.2 hectares</p>
-          </div>
-          <div>
-            <p class="text-slate-400 text-xs font-semibold mb-1">Plan</p>
-            <p class="text-slate-700 font-medium">Pro — Annual</p>
+
+          <form id="form-edit-profile" onsubmit="event.preventDefault(); saveProfileChanges();">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Farmer Full Name</label>
+                <input id="edit-fullname" type="text" placeholder="e.g. Rishav Kumar" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Farm / Village Location</label>
+                <input id="edit-location" type="text" placeholder="e.g. Ranchi, Jharkhand" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Total Landholding (Hectares)</label>
+                <input id="edit-size" type="number" step="0.1" min="0.1" max="1000" placeholder="e.g. 3.5" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Contact Phone Number</label>
+                <input id="edit-phone" type="text" placeholder="e.g. +91 98765 43210" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <button type="submit" id="btn-save-profile" class="w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg shadow-emerald-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+              Save Farm Profile Changes
+            </button>
+          </form>
+
+          <!-- Account Security & Password Form -->
+          <div class="mt-8 pt-6 border-t border-slate-100">
+            <div class="flex items-center justify-between pb-3 mb-4">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i> Account Security & Password
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Update your password securely in the database.</p>
+              </div>
+              <span class="text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">PBKDF2-SHA256</span>
+            </div>
+
+            <form id="form-change-password" onsubmit="event.preventDefault(); submitChangePassword();">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Current Password *</label>
+                  <input id="curr-password" type="password" placeholder="••••••••" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">New Password *</label>
+                  <input id="new-password" type="password" placeholder="Min 6 characters" minlength="6" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Confirm New Password *</label>
+                  <input id="confirm-password" type="password" placeholder="Re-enter password" minlength="6" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-emerald-500">
+                </div>
+              </div>
+
+              <button type="submit" id="btn-change-pw" class="px-6 py-2.5 rounded-xl font-bold text-white text-xs bg-slate-800 hover:bg-slate-900 transition shadow-sm">
+                Update Password
+              </button>
+            </form>
           </div>
         </div>
-        <button class="mt-7 w-full py-2.5 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(90deg,var(--mint),var(--mint-dark));">Edit Profile</button>
       </div>
     </section>
 
   </main>
-</div>
 
-<script>
-  lucide.createIcons();
+  <!-- ================= AUTH MODAL (LOGIN / REGISTER) ================= -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="glass rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-white/60 bg-white">
+      <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
 
-  // ---------------- TAB SWITCHING ----------------
-  function showTab(name){
-    document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navBtn = document.querySelector('.nav-item[data-tab="' + name + '"]');
-    if (navBtn) navBtn.classList.add('active');
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-  document.querySelectorAll('.nav-item').forEach(btn=>{
-    btn.addEventListener('click', ()=> showTab(btn.dataset.tab));
-  });
-  document.getElementById('logout-btn').addEventListener('click', ()=>{
-    alert('You have been logged out (demo).');
-  });
+      <!-- Logo in Modal -->
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 mx-auto mb-2 flex items-center justify-center rounded-2xl shadow-md bg-emerald-50">
+          <img src="/assets/favicon.svg" alt="कृषिVision" class="w-8 h-8" />
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">
+          <span class="hindi text-emerald-700">कृषि</span><span style="color:var(--mint-dark);">Vision</span> Account
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">Sign in to save predictions and personalized farm analytics.</p>
+      </div>
 
-  // ---------------- CROP IMAGE MAP (contextual, dynamic) ----------------
-  const cropImageKeywords = {
-    rice: 'rice,paddy,field', maize: 'corn,maize,field', coffee: 'coffee,plantation,beans',
-    cotton: 'cotton,field,plant', jute: 'jute,plant,field', coconut: 'coconut,palm,tree',
-    banana: 'banana,plantation,tree', mango: 'mango,tree,fruit', grapes: 'grapes,vineyard',
-    watermelon: 'watermelon,field', muskmelon: 'muskmelon,melon,field', apple: 'apple,orchard,tree',
-    orange: 'orange,citrus,tree', papaya: 'papaya,tree,fruit', pomegranate: 'pomegranate,fruit,tree',
-    chickpea: 'chickpea,legume,field', kidneybeans: 'kidney,beans,field', pigeonpeas: 'pigeon,peas,field',
-    mothbeans: 'moth,beans,field', mungbean: 'mung,bean,field', blackgram: 'black,gram,lentil,field',
-    lentil: 'lentil,field,crop', jowar: 'sorghum,millet,field', wheat: 'wheat,field,golden',
-    sugarcane: 'sugarcane,field', default: 'farm,agriculture,green,field'
-  };
-  function cropImageUrl(cropName){
-    const key = cropName.toLowerCase().replace(/\s+/g,'');
-    const kw = cropImageKeywords[key] || cropImageKeywords.default;
-    return 'https://loremflickr.com/700/460/' + encodeURIComponent(kw) + '?lock=' + Math.floor(Math.random()*1000);
-  }
+      <!-- Tab Buttons -->
+      <div class="flex rounded-xl bg-slate-100 p-1 mb-6">
+        <button id="modal-tab-login" onclick="switchModalTab('login')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+          Sign In
+        </button>
+        <button id="modal-tab-register" onclick="switchModalTab('register')" class="flex-1 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition">
+          Register New Farmer
+        </button>
+      </div>
 
-  // ---------------- LOCAL FALLBACK SIMULATION (mirrors backend logic) ----------------
-  function simulatePredict(d){
-    const {n,p,k,temperature,humidity,ph,rainfall} = d;
-    if (rainfall > 200 && n > 80 && humidity > 70) return {crop:'Rice', confidence:96, description:'High rainfall, strong nitrogen levels and humidity make this a strong paddy candidate.'};
-    if (rainfall < 100 && ph < 6.8 && temperature >= 23 && temperature <= 28) return {crop:'Coffee', confidence:93, description:'Moderate temperature and slightly acidic soil favour coffee cultivation.'};
-    if (k > 60 && p > 60 && rainfall < 80) return {crop:'Cotton', confidence:92, description:'High potassium and phosphorus with low rainfall suits cotton well.'};
-    if (n > 60 && rainfall >= 80 && rainfall <= 150 && temperature > 24) return {crop:'Maize', confidence:90, description:'Balanced nitrogen and moderate rainfall are ideal for maize.'};
-    if (humidity > 80 && rainfall > 150 && temperature > 24) return {crop:'Coconut', confidence:94, description:'High humidity and warm coastal-like conditions favour coconut palms.'};
-    if (ph < 6 && rainfall < 90 && temperature > 25) return {crop:'Grapes', confidence:88, description:'Low rainfall and slightly acidic soil are typical of vineyard regions.'};
-    if (temperature > 30 && humidity < 50) return {crop:'Watermelon', confidence:87, description:'Hot and dry conditions are well suited to melons.'};
-    if (rainfall > 120 && humidity > 75) return {crop:'Banana', confidence:89, description:'Consistent rainfall and high humidity favour banana plantations.'};
-    return {crop:'Mixed Legumes', confidence:78, description:'These conditions are moderate; a legume rotation is a safe, soil-friendly choice.'};
-  }
+      <!-- Login Form -->
+      <form id="form-login" onsubmit="event.preventDefault(); submitLogin();">
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Username or Email</label>
+            <input id="login-username" type="text" placeholder="Your username or email" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+            <input id="login-password" type="password" placeholder="••••••••" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500">
+          </div>
+        </div>
+        <button type="submit" id="btn-login-submit" class="w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg shadow-emerald-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+          Sign In
+        </button>
+        <button type="button" id="btn-demo-login" onclick="fillDemoCredentials()" class="w-full mt-3 py-2.5 rounded-xl border border-emerald-200 text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i> Demo Login: 1-Click Fast Access
+        </button>
+      </form>
 
-  async function predictCrop(){
-    const payload = {
-      nitrogen: parseFloat(document.getElementById('in-n').value),
-      phosphorus: parseFloat(document.getElementById('in-p').value),
-      potassium: parseFloat(document.getElementById('in-k').value),
-      temperature: parseFloat(document.getElementById('in-temp').value),
-      humidity: parseFloat(document.getElementById('in-humidity').value),
-      ph: parseFloat(document.getElementById('in-ph').value),
-      rainfall: parseFloat(document.getElementById('in-rainfall').value),
-    };
+      <!-- Register Form -->
+      <form id="form-register" class="hidden" onsubmit="event.preventDefault(); submitRegister();">
+        <div class="space-y-3 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Username *</label>
+            <input id="reg-username" type="text" placeholder="e.g. farmer_anil" required class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Email Address *</label>
+            <input id="reg-email" type="email" placeholder="e.g. anil@farm.in" required class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+            <input id="reg-name" type="text" placeholder="e.g. Anil Kumar" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Password *</label>
+            <input id="reg-password" type="password" placeholder="At least 6 characters" minlength="6" required class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Location</label>
+              <input id="reg-location" type="text" placeholder="Jharkhand" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Farm Size (Ha)</label>
+              <input id="reg-size" type="number" step="0.1" value="2.5" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+            </div>
+          </div>
+        </div>
+        <button type="submit" id="btn-register-submit" class="w-full py-3 rounded-xl font-bold text-white text-sm shadow-lg shadow-emerald-600/20 hover:brightness-105 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </div>
 
-    const btn = document.getElementById('predict-btn');
-    const icon = document.getElementById('predict-icon');
-    const label = document.getElementById('predict-label');
-    btn.disabled = true;
-    label.textContent = 'Analyzing...';
-    icon.outerHTML = '<span class="spinner" id="predict-icon"></span>';
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    // E-08: Configurable dynamic API base resolution (prefers same-origin, respects window override, falls back for VS Code Live Server)
+    function resolveApiBase() {
+      if (window.KRISHIVISION_API_BASE) {
+        return window.KRISHIVISION_API_BASE;
+      }
+      if (window.location && window.location.origin && window.location.origin.startsWith('http')) {
+        // If loaded directly from FastAPI backend port (8000) or reverse proxy
+        if (window.location.port === '8000' || (window.location.port === '' && window.location.pathname.startsWith('/app'))) {
+          return window.location.origin;
+        }
+      }
+      // VS Code Live Server (typically port 5500) or file:/// protocol fallback
+      return 'http://127.0.0.1:8000';
+    }
+    const API_BASE = resolveApiBase();
+    let currentAuthToken = localStorage.getItem('krishi_auth_token') || null;
+    let currentUser = null;
+    let selectedLeafFile = null;
+    let allDiseaseClasses = [];
+    let allHistoryRecords = [];
+    let currentHistoryFilter = 'all';
 
-    let result;
-    try{
-      const res = await fetch('http://localhost:8000/api/predict', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      if(!res.ok) throw new Error('backend not reachable');
-      const data = await res.json();
-      result = { crop: data.crop, confidence: data.confidence, description: data.description };
-    } catch(err){
-      // graceful fallback so the UI still works if the FastAPI backend isn't running
-      result = simulatePredict({
-        n: payload.nitrogen, p: payload.phosphorus, k: payload.potassium,
-        temperature: payload.temperature, humidity: payload.humidity,
-        ph: payload.ph, rainfall: payload.rainfall
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initApp();
+    });
+
+    // ---------------- TAB NAVIGATION ----------------
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById('tab-' + tabName);
+      if (activePanel) activePanel.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const activeNav = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+      if (activeNav) activeNav.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (tabName === 'history') loadHistoryData();
+      if (tabName === 'analytics') loadAnalyticsData();
+      if (tabName === 'dashboard') loadDashboardData();
+      if (tabName === 'disease' && allDiseaseClasses.length === 0) loadDiseaseEncyclopedia();
     }
 
-    document.getElementById('result-crop').textContent = result.crop;
-    document.getElementById('result-desc').textContent = result.description;
-    document.getElementById('confidence-bar').style.width = result.confidence + '%';
-    document.getElementById('confidence-text').textContent = result.confidence + '% confidence';
-    document.getElementById('result-img').src = cropImageUrl(result.crop);
-    document.getElementById('result-card').classList.remove('hidden');
+    function toggleMobileNav() {
+      const drawer = document.getElementById('mobile-nav-drawer');
+      if (drawer) drawer.classList.toggle('hidden');
+    }
 
-    btn.disabled = false;
-    label.textContent = 'Predict Crop';
-    document.getElementById('predict-icon').outerHTML = '<i data-lucide="wand-sparkles" class="w-4 h-4" id="predict-icon"></i>';
-    lucide.createIcons();
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', () => showTab(btn.dataset.tab));
+    });
 
-    document.getElementById('result-card').scrollIntoView({behavior:'smooth', block:'nearest'});
-  }
+    // ---------------- CROP PATH SWITCHING ----------------
+    function switchCropPath(path) {
+      const containerA = document.getElementById('container-path-a');
+      const containerB = document.getElementById('container-path-b');
+      const btnA = document.getElementById('btn-choice-path-a');
+      const btnB = document.getElementById('btn-choice-path-b');
+      document.getElementById('crop-result-card').classList.add('hidden');
 
-  // ---------------- DISEASE DETECTION DRAG & DROP ----------------
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  dropZone.addEventListener('click', ()=> fileInput.click());
-  ['dragenter','dragover'].forEach(evt=>{
-    dropZone.addEventListener(evt, e=>{ e.preventDefault(); dropZone.classList.add('drag-over'); });
-  });
-  ['dragleave','drop'].forEach(evt=>{
-    dropZone.addEventListener(evt, e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); });
-  });
-  dropZone.addEventListener('drop', e=>{
-    if(e.dataTransfer.files.length) handleLeafFile(e.dataTransfer.files[0]);
-  });
-  fileInput.addEventListener('change', e=>{
-    if(e.target.files.length) handleLeafFile(e.target.files[0]);
-  });
-  function handleLeafFile(file){
-    const url = URL.createObjectURL(file);
-    document.getElementById('preview-img').src = url;
-    document.getElementById('disease-preview').classList.remove('hidden');
-  }
-</script>
+      if (path === 'path-a') {
+        containerA.classList.remove('hidden');
+        containerB.classList.add('hidden');
+        btnA.className = 'text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/60 transition flex items-start gap-3.5 shadow-sm';
+        btnB.className = 'text-left p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 bg-white transition flex items-start gap-3.5';
+      } else {
+        containerA.classList.add('hidden');
+        containerB.classList.remove('hidden');
+        btnB.className = 'text-left p-4 rounded-xl border-2 border-amber-500 bg-amber-50/60 transition flex items-start gap-3.5 shadow-sm';
+        btnA.className = 'text-left p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 bg-white transition flex items-start gap-3.5';
+      }
+    }
+
+    // ---------------- QUICK SOIL PRESETS ----------------
+    const presets = {
+      rice: { n: 90, p: 42, k: 43, ph: 6.5, temp: 28.5, humidity: 72, rainfall: 202, loc: 'Jharkhand' },
+      maize: { n: 80, p: 40, k: 20, ph: 6.2, temp: 24.0, humidity: 65, rainfall: 95, loc: 'Bihar' },
+      chickpea: { n: 40, p: 60, k: 20, ph: 6.0, temp: 22.0, humidity: 50, rainfall: 65, loc: 'Madhya Pradesh' },
+      cotton: { n: 120, p: 45, k: 20, ph: 7.2, temp: 26.0, humidity: 60, rainfall: 80, loc: 'Gujarat' },
+      coffee: { n: 100, p: 30, k: 30, ph: 6.4, temp: 25.0, humidity: 75, rainfall: 160, loc: 'Karnataka' },
+      apple: { n: 25, p: 130, k: 200, ph: 6.2, temp: 22.0, humidity: 92, rainfall: 110, loc: 'Himachal Pradesh' }
+    };
+
+    function loadSoilPreset(key) {
+      const p = presets[key];
+      if (!p) return;
+      document.getElementById('in-n').value = p.n;
+      document.getElementById('in-p').value = p.p;
+      document.getElementById('in-k').value = p.k;
+      document.getElementById('in-ph').value = p.ph;
+      document.getElementById('in-temp').value = p.temp;
+      document.getElementById('in-humidity').value = p.humidity;
+      document.getElementById('in-rainfall').value = p.rainfall;
+      document.getElementById('in-loc-a').value = p.loc;
+      updateNutrientBadge('n', p.n);
+      updateNutrientBadge('p', p.p);
+      updateNutrientBadge('k', p.k);
+      updateNutrientBadge('ph', p.ph);
+      notify(`Loaded ${key.toUpperCase()} agronomic benchmark values into form.`, 'info');
+    }
+
+    const stateClimates = {
+      'jharkhand': { temp: 27.5, humidity: 74, rainfall: 185 },
+      'bihar': { temp: 26.0, humidity: 70, rainfall: 140 },
+      'punjab': { temp: 23.5, humidity: 58, rainfall: 75 },
+      'uttar pradesh': { temp: 25.5, humidity: 66, rainfall: 115 },
+      'madhya pradesh': { temp: 28.0, humidity: 55, rainfall: 90 },
+      'maharashtra': { temp: 29.0, humidity: 62, rainfall: 125 },
+      'gujarat': { temp: 29.5, humidity: 58, rainfall: 85 },
+      'karnataka': { temp: 26.0, humidity: 76, rainfall: 155 },
+      'tamil nadu': { temp: 30.0, humidity: 78, rainfall: 130 },
+      'west bengal': { temp: 28.0, humidity: 82, rainfall: 210 },
+      'himachal': { temp: 21.0, humidity: 85, rainfall: 120 }
+    };
+
+    function autoFillClimateFromLocation() {
+      const loc = (document.getElementById('in-loc-a').value || '').toLowerCase().trim();
+      for (const [state, clim] of Object.entries(stateClimates)) {
+        if (loc.includes(state)) {
+          document.getElementById('in-temp').value = clim.temp;
+          document.getElementById('in-humidity').value = clim.humidity;
+          document.getElementById('in-rainfall').value = clim.rainfall;
+          notify(`Autofilled climate for ${state.toUpperCase()}: ${clim.temp}°C, ${clim.humidity}%, ${clim.rainfall}mm rainfall.`, 'info');
+          return;
+        }
+      }
+      notify('Enter a recognized state (e.g. Jharkhand, Bihar, Punjab, Karnataka) to autofill climate.', 'info');
+    }
+
+    function clearSoilForm() {
+      ['in-n', 'in-p', 'in-k', 'in-ph', 'in-temp', 'in-humidity', 'in-rainfall', 'in-loc-a'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('badge-n').textContent = '0–140';
+      document.getElementById('badge-p').textContent = '5–145';
+      document.getElementById('badge-k').textContent = '5–205';
+      document.getElementById('badge-ph').textContent = '3.5–10.0';
+      document.getElementById('crop-result-card').classList.add('hidden');
+    }
+
+    function updateNutrientBadge(type, val) {
+      const v = parseFloat(val);
+      if (isNaN(v)) return;
+      if (type === 'ph') {
+        const badge = document.getElementById('badge-ph');
+        if (v < 6.0) badge.innerHTML = '<span class="text-amber-600 font-bold">Acidic</span>';
+        else if (v <= 7.5) badge.innerHTML = '<span class="text-emerald-600 font-bold">Optimal Neutral</span>';
+        else badge.innerHTML = '<span class="text-blue-600 font-bold">Alkaline</span>';
+      } else if (type === 'n') {
+        const badge = document.getElementById('badge-n');
+        badge.innerHTML = v < 50 ? '<span class="text-amber-600">Low N</span>' : v < 100 ? '<span class="text-emerald-600 font-bold">Medium</span>' : '<span class="text-purple-600 font-bold">High N</span>';
+      }
+    }
+
+    // E-04: Secure demo login using configured backend demo-user endpoint (no hardcoded password in frontend)
+    async function fillDemoCredentials() {
+      const btn = document.getElementById('btn-demo-login');
+      if (btn) btn.disabled = true;
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/demo-login`, {
+          method: 'POST'
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Demo login is not available');
+        }
+        const data = await res.json();
+        currentAuthToken = data.access_token;
+        localStorage.setItem('krishi_auth_token', currentAuthToken);
+        currentUser = data.user;
+        updateUserUI(currentUser);
+        closeAuthModal();
+        notify(`Welcome back, ${data.user.full_name || data.user.username}! Signed in with demo profile.`, 'success');
+        loadHistoryData();
+        loadAnalyticsData();
+      } catch (err) {
+        notify(`Demo login: ${err.message}`, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    // ---------------- CROP IMAGE MAP ----------------
+    const cropImages = {
+      rice: 'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?auto=format&fit=crop&w=600&q=80',
+      maize: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80',
+      chickpea: 'https://images.unsplash.com/photo-1589135233689-d49fa2903511?auto=format&fit=crop&w=600&q=80',
+      kidneybeans: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=600&q=80',
+      pigeonpeas: 'https://images.unsplash.com/photo-1598965675045-45c5e72c7d05?auto=format&fit=crop&w=600&q=80',
+      coffee: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80',
+      cotton: 'https://images.unsplash.com/photo-1606041008023-472dfb5e530f?auto=format&fit=crop&w=600&q=80',
+      jute: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=600&q=80',
+      banana: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80',
+      mango: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=600&q=80',
+      grapes: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=600&q=80',
+      watermelon: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+      apple: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80',
+      orange: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=600&q=80',
+      papaya: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?auto=format&fit=crop&w=600&q=80',
+      coconut: 'https://images.unsplash.com/photo-1544376798-89aa6b82c6cd?auto=format&fit=crop&w=600&q=80',
+      mustard: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80',
+      wheat: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80',
+      default: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=600&q=80'
+    };
+
+    function getCropImage(name) {
+      const clean = (name || '').toLowerCase().trim();
+      return cropImages[clean] || cropImages.default;
+    }
+
+    // ---------------- SUBMIT PATH A ----------------
+    async function submitPathAPrediction() {
+      const btn = document.getElementById('btn-predict-path-a');
+      const label = document.getElementById('label-predict-a');
+
+      // Validation
+      const nVal = parseFloat(document.getElementById('in-n').value);
+      const pVal = parseFloat(document.getElementById('in-p').value);
+      const kVal = parseFloat(document.getElementById('in-k').value);
+      const phVal = parseFloat(document.getElementById('in-ph').value);
+      const tempVal = parseFloat(document.getElementById('in-temp').value);
+      const humVal = parseFloat(document.getElementById('in-humidity').value);
+      const rainVal = parseFloat(document.getElementById('in-rainfall').value);
+
+      if (isNaN(nVal) || isNaN(pVal) || isNaN(kVal) || isNaN(phVal) || isNaN(tempVal) || isNaN(humVal) || isNaN(rainVal)) {
+        notify('Please fill out all 7 soil and meteorological numerical fields.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      label.textContent = 'Running Random Forest Model...';
+
+      const payload = {
+        nitrogen: nVal,
+        phosphorus: pVal,
+        potassium: kVal,
+        ph: phVal,
+        temperature: tempVal,
+        humidity: humVal,
+        rainfall: rainVal,
+        location: document.getElementById('in-loc-a').value || null,
+        season: document.getElementById('in-season-a').value || null,
+        soil_type: document.getElementById('in-soil-a').value || null
+      };
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/predict`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          let errMessage = 'Prediction failed';
+          if (Array.isArray(err.detail)) {
+            errMessage = err.detail.map(d => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(', ');
+          } else if (typeof err.detail === 'string') {
+            errMessage = err.detail;
+          }
+          throw new Error(errMessage);
+        }
+
+        const data = await res.json();
+        renderPathAResult(data, payload);
+        if (data.persisted) {
+          notify(`Success: Recommended ${data.crop} (${data.confidence}% model probability score). Saved to database!`, 'success');
+        } else {
+          notify(`Recommendation: ${data.crop} (${data.confidence}% model probability score). Record not saved to database${data.persistence_error ? ': ' + data.persistence_error : ''}`, 'warning');
+        }
+        loadAnalyticsData(); // Update live counters
+      } catch (err) {
+        notify(`Prediction error: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        label.textContent = 'Run Random Forest Inference';
+      }
+    }
+    function renderPathAResult(data, payload) {
+      const card = document.getElementById('crop-result-card');
+      const inner = document.getElementById('crop-result-inner');
+
+      let alternativesHtml = '';
+      if (data.alternatives && data.alternatives.length > 0) {
+        alternativesHtml = `
+          <div class="mt-5 pt-4 border-t border-slate-100">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Top Alternative Crops Considered</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              ${data.alternatives.map(alt => `
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div class="flex items-center justify-between">
+                    <p class="font-bold text-slate-800 text-xs">${alt.crop}</p>
+                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">${alt.confidence}% score</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-1 line-clamp-2">${alt.description}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      inner.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-6 items-center">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                <i data-lucide="award" class="w-3.5 h-3.5"></i> Optimal Recommended Crop
+              </span>
+              <span class="text-xs text-slate-400">Path A (ML Verified)</span>
+            </div>
+            <h3 class="text-3xl font-extrabold text-slate-900 mb-2">${data.crop}</h3>
+            <p class="text-sm text-slate-600 mb-4 max-w-lg leading-relaxed">${data.description}</p>
+
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex-1 h-3 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-700" style="width:${data.confidence}%; background: linear-gradient(90deg, var(--mint), var(--mint-dark));"></div>
+              </div>
+              <span class="text-sm font-extrabold text-emerald-700 whitespace-nowrap">${data.confidence}% model probability score</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 grid grid-cols-4 gap-2">
+              <div><span class="text-slate-400 block font-medium">N-P-K:</span> ${payload.nitrogen}-${payload.phosphorus}-${payload.potassium}</div>
+              <div><span class="text-slate-400 block font-medium">Soil pH:</span> ${payload.ph}</div>
+              <div><span class="text-slate-400 block font-medium">Temp:</span> ${payload.temperature}°C</div>
+              <div><span class="text-slate-400 block font-medium">Rainfall:</span> ${payload.rainfall} mm</div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <img src="${getCropImage(data.crop)}" alt="${data.crop}" class="w-full h-48 object-cover rounded-2xl shadow-md border border-white">
+            <span class="absolute bottom-2 right-2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded backdrop-blur-sm">${data.crop}</span>
+          </div>
+        </div>
+        ${alternativesHtml}
+      `;
+
+      card.classList.remove('hidden');
+      lucide.createIcons();
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ---------------- SUBMIT PATH B ----------------
+    async function submitPathBGuidance() {
+      const btn = document.getElementById('btn-predict-path-b');
+      const label = document.getElementById('label-predict-b');
+      btn.disabled = true;
+      label.textContent = 'Generating Agro-Climatic Guidance...';
+
+      const payload = {
+        location: document.getElementById('in-loc-b').value,
+        season: document.getElementById('in-season-b').value,
+        water_availability: document.getElementById('in-water-b').value,
+        irrigation_available: document.getElementById('in-irrigation-b').value === 'true',
+        soil_type: document.getElementById('in-soil-b').value || null,
+        previous_crop: document.getElementById('in-prev-crop-b').value || null
+      };
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/crop-guidance`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          let errMessage = 'Guidance failed';
+          if (Array.isArray(err.detail)) {
+            errMessage = err.detail.map(d => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(', ');
+          } else if (typeof err.detail === 'string') {
+            errMessage = err.detail;
+          }
+          throw new Error(errMessage);
+        }
+
+        const data = await res.json();
+        renderPathBResult(data);
+        if (data.persisted) {
+          notify('Agro-climatic guidance saved to your history.', 'success');
+        } else {
+          notify(`Guidance generated but not saved to the database${data.persistence_error ? ': ' + data.persistence_error : ''}`, 'warning');
+        }
+        loadAnalyticsData();
+      } catch (err) {
+        notify(`Guidance failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        label.textContent = 'Generate Agro-Climatic Guidance';
+      }
+    }
+
+    function renderPathBResult(data) {
+      const card = document.getElementById('crop-result-card');
+      const inner = document.getElementById('crop-result-inner');
+
+      inner.innerHTML = `
+        <div class="mb-5 pb-4 border-b border-slate-100 flex items-start justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md">
+              Path B — Preliminary Agro-Climatic Guidance
+            </span>
+            <h3 class="text-xl font-extrabold text-slate-900 mt-2">Suitable Crops for <span data-guidance-location></span> (<span data-guidance-season></span> Season)</h3>
+            <p class="text-xs text-slate-500 mt-1" data-guidance-message></p>
+          </div>
+          <button onclick="switchCropPath('path-a')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition">
+            Switch to Path A
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+          ${(data.recommendations || []).map((r, recommendationIndex) => `
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber-400 transition">
+              <div class="flex items-center gap-3 mb-2">
+                <img src="${getCropImage(r.crop)}" class="w-10 h-10 object-cover rounded-lg shadow-sm" />
+                <div>
+                  <h4 class="font-bold text-slate-900 text-sm" data-guidance-crop="${recommendationIndex}"></h4>
+                  <span class="text-[10px] text-amber-700 font-semibold bg-amber-100 px-1.5 py-0.5 rounded">Agro-Match</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 mb-2" data-guidance-reason="${recommendationIndex}"></p>
+              <ul class="text-[11px] text-slate-500 list-disc list-inside space-y-0.5">
+                ${(r.matching_factors || []).slice(0, 2).map((_, factorIndex) => `<li data-guidance-factor="${recommendationIndex}-${factorIndex}"></li>`).join('')}
+              </ul>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+            <span>Obtain a Soil Health Card with Nitrogen, Phosphorus, Potassium and pH for full Random Forest predictions.</span>
+          </div>
+          <button onclick="switchCropPath('path-a')" class="px-3 py-1 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition">
+            Enter Soil Card
+          </button>
+        </div>
+      `;
+
+      inner.querySelector('[data-guidance-location]').textContent = data.location || '';
+      inner.querySelector('[data-guidance-season]').textContent = data.season || '';
+      inner.querySelector('[data-guidance-message]').textContent = data.message || '';
+      (data.recommendations || []).forEach((recommendation, recommendationIndex) => {
+        const cropElement = inner.querySelector(`[data-guidance-crop="${recommendationIndex}"]`);
+        const reasonElement = inner.querySelector(`[data-guidance-reason="${recommendationIndex}"]`);
+        if (cropElement) cropElement.textContent = recommendation.crop || '';
+        if (reasonElement) reasonElement.textContent = recommendation.reason || '';
+        (recommendation.matching_factors || []).slice(0, 2).forEach((factor, factorIndex) => {
+          const factorElement = inner.querySelector(`[data-guidance-factor="${recommendationIndex}-${factorIndex}"]`);
+          if (factorElement) factorElement.textContent = factor;
+        });
+      });
+
+      card.classList.remove('hidden');
+      lucide.createIcons();
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ---------------- PLANT DISEASE DETECTION ----------------
+    const dropZone = document.getElementById('drop-zone');
+    const leafFileInput = document.getElementById('leaf-file-input');
+
+    ['dragenter', 'dragover'].forEach(e => {
+      dropZone.addEventListener(e, evt => { evt.preventDefault(); dropZone.classList.add('drag-over'); });
+    });
+    ['dragleave', 'drop'].forEach(e => {
+      dropZone.addEventListener(e, evt => { evt.preventDefault(); dropZone.classList.remove('drag-over'); });
+    });
+    dropZone.addEventListener('drop', evt => {
+      if (evt.dataTransfer.files.length) handleSelectedLeaf(evt.dataTransfer.files[0]);
+    });
+    leafFileInput.addEventListener('change', evt => {
+      if (evt.target.files.length) handleSelectedLeaf(evt.target.files[0]);
+    });
+
+    function handleSelectedLeaf(file) {
+      if (!file.type.startsWith('image/')) {
+        notify('Please select a valid image file (JPG, PNG, WEBP).', 'error');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        notify('File size exceeds the 10 MB limit.', 'error');
+        return;
+      }
+
+      selectedLeafFile = file;
+      document.getElementById('leaf-preview-img').src = URL.createObjectURL(file);
+      document.getElementById('leaf-preview-name').textContent = file.name;
+      document.getElementById('leaf-preview-size').textContent = `${(file.size / 1024).toFixed(1)} KB · Ready for 224x224 RGB tensor preprocessing`;
+      document.getElementById('disease-selected-box').classList.remove('hidden');
+    }
+
+    async function loadSampleLeaf(sampleType) {
+      const sampleMap = {
+        tomato: {
+          file: '/assets/samples/tomato_leaf_sample.jpg',
+          name: 'tomato_early_blight_sample.jpg'
+        },
+        potato: {
+          file: '/assets/samples/potato_leaf_sample.jpg',
+          name: 'potato_late_blight_sample.jpg'
+        },
+        corn: {
+          file: '/assets/samples/corn_leaf_sample.jpg',
+          name: 'corn_rust_sample.jpg'
+        }
+      };
+      const s = sampleMap[sampleType];
+      if (!s) return;
+      try {
+        notify(`Loading benchmark image: ${s.name}...`, 'info');
+        const res = await fetch(s.file);
+        if (!res.ok) throw new Error('Sample asset not found');
+        const blob = await res.blob();
+        const file = new File([blob], s.name, { type: 'image/jpeg' });
+        handleSelectedLeaf(file);
+        notify(`Loaded ${s.name}. Click "Diagnose Foliage" to analyze!`, 'success');
+      } catch (err) {
+        notify('Failed to load sample image: ' + err.message, 'error');
+      }
+    }
+
+    async function submitDiseaseDetection() {
+      if (!selectedLeafFile) return;
+      const btn = document.getElementById('btn-analyze-leaf');
+      const label = document.getElementById('label-analyze-leaf');
+      btn.disabled = true;
+      label.textContent = 'Preprocessing & Evaluating...';
+
+      const formData = new FormData();
+      formData.append('file', selectedLeafFile);
+
+      try {
+        const headers = {};
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/disease/predict`, {
+          method: 'POST',
+          headers: headers,
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Disease detection failed');
+        }
+
+        const data = await res.json();
+        renderDiseaseResult(data);
+        if (data.persisted) {
+          notify('Foliar image evaluated and saved to your history!', 'success');
+        } else {
+          notify(`Foliar diagnosis complete. (Note: Record not saved to database${data.persistence_error ? ': ' + data.persistence_error : ''})`, 'warning');
+        }
+        loadAnalyticsData();
+      } catch (err) {
+        notify(`Analysis failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        label.textContent = 'Diagnose Foliage';
+      }
+    }
+
+    function renderDiseaseResult(data) {
+      const container = document.getElementById('disease-result-container');
+      const isWeightMissing = data.model_status === 'model_weights_not_found';
+      const d = data.disease_info;
+
+      let diagnosisHtml = '';
+      if (d) {
+        const isHealthy = d.is_healthy;
+        diagnosisHtml = `
+          <div class="mb-6 p-5 rounded-2xl bg-white border border-slate-100 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md">${d.plant_name}</span>
+                  <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md ${isHealthy ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                    ${isHealthy ? 'Healthy Plant' : 'Severity: ' + d.severity}
+                  </span>
+                </div>
+                <h3 class="text-2xl font-extrabold text-slate-900">${d.disease_name}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Pathogen Taxonomy: <strong class="text-slate-700">${d.pathogen_type}</strong></p>
+              </div>
+              <div class="sm:text-right">
+                <span class="text-2xl font-black ${data.confidence >= 70 ? 'text-emerald-700' : 'text-amber-600'}">${data.confidence || '--'}%</span>
+                <span class="text-[11px] text-slate-500 block font-medium">Model score</span>
+              </div>
+            </div>
+
+            <!-- Model score bar -->
+            <div class="mb-5">
+              <div class="flex justify-between text-xs text-slate-500 font-medium mb-1">
+                <span>Neural model score</span>
+                <span>${data.confidence || 0}%</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-700" style="width: ${data.confidence || 0}%; background: linear-gradient(90deg, var(--mint), var(--mint-dark));"></div>
+              </div>
+            </div>
+
+            <!-- Symptoms -->
+            <div class="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1 flex items-center gap-1.5">
+                <i data-lucide="eye" class="w-4 h-4 text-emerald-600"></i> Foliar Diagnostic Symptoms
+              </h4>
+              <p class="text-xs text-slate-700 leading-relaxed">${d.symptoms}</p>
+            </div>
+
+            <!-- 3-Tier Treatment Regimens -->
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-1.5">
+                <i data-lucide="shield-plus" class="w-4 h-4 text-emerald-600"></i> Recommended 3-Tier Action Regimen
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200/70 shadow-sm">
+                  <h5 class="font-bold text-emerald-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
+                    <i data-lucide="leaf" class="w-3.5 h-3.5 text-emerald-600"></i> 1. Organic / Bio Control
+                  </h5>
+                  <p class="text-xs text-emerald-900 leading-relaxed">${d.treatments.organic}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-blue-50/80 border border-blue-200/70 shadow-sm">
+                  <h5 class="font-bold text-blue-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-600"></i> 2. Chemical Treatment
+                  </h5>
+                  <p class="text-xs text-blue-900 leading-relaxed">${d.treatments.chemical}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200/70 shadow-sm">
+                  <h5 class="font-bold text-amber-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
+                    <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-600"></i> 3. Cultural & Preventive
+                  </h5>
+                  <p class="text-xs text-amber-900 leading-relaxed">${d.treatments.cultural}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="glass rounded-2xl p-7 shadow-2xl border ${isWeightMissing ? 'border-amber-200' : 'border-emerald-300'}">
+          <div class="flex items-start justify-between mb-4 pb-4 border-b border-slate-100">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider ${isWeightMissing ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'} px-2.5 py-1 rounded-md">
+                ${isWeightMissing ? 'Model Status: Neural Weights Not Loaded' : 'Deep Learning Vision Diagnosis (MobileNetV2)'}
+              </span>
+              <h3 id="disease-result-filename" class="text-xl font-extrabold text-slate-900 mt-2"></h3>
+              <p class="text-xs text-slate-500 mt-0.5">Dimensions: <span id="disease-result-dimensions">${data.image_details?.dimensions || '224x224'}</span> RGB · MobileNetV2 Tensor Normalization Verified</p>
+            </div>
+            <div class="text-right">
+              <span id="disease-result-timestamp" class="text-xs text-slate-400 block">${data.timestamp || ''}</span>
+            </div>
+          </div>
+
+          ${diagnosisHtml}
+
+          <div class="p-4 rounded-xl ${isWeightMissing ? 'bg-amber-50 text-amber-900' : 'bg-emerald-50/60 text-emerald-950'} text-xs leading-relaxed mb-5 border border-emerald-100">
+            <strong>System Status:</strong> <span id="disease-result-message">${data.message || ''}</span>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-slate-900 text-sm">Diagnostic Encyclopedia Reference</h4>
+              <p class="text-xs text-slate-600">Browse the 27-class treatment encyclopedia below for symptoms and remedies across Tomato, Potato, Corn, Apple, Grape, and Pepper.</p>
+            </div>
+            <button onclick="document.getElementById('encyclopedia-grid').scrollIntoView({behavior:'smooth'})" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">
+              Explore Encyclopedia &darr;
+            </button>
+          </div>
+        </div>
+      `;
+
+      const filenameElement = container.querySelector('#disease-result-filename');
+      if (filenameElement) filenameElement.textContent = data.filename || 'Uploaded Leaf';
+      container.classList.remove('hidden');
+      lucide.createIcons();
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function loadDiseaseEncyclopedia() {
+      try {
+        const res = await fetch(`${API_BASE}/api/disease/classes`);
+        if (!res.ok) return;
+        allDiseaseClasses = await res.json();
+        renderEncyclopediaCards(allDiseaseClasses);
+      } catch (err) {
+        console.warn('Could not load disease encyclopedia:', err);
+      }
+    }
+
+    function renderEncyclopediaCards(classes) {
+      const grid = document.getElementById('encyclopedia-grid');
+      grid.innerHTML = classes.map(c => `
+        <div class="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">${c.plant_name}</span>
+            <span class="text-[10px] font-semibold text-slate-400">${c.severity}</span>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm mb-1">${c.disease_name}</h4>
+          <p class="text-[11px] text-slate-500 mb-3">${c.pathogen_type}</p>
+          <button onclick="viewDiseaseDetail('${c.class_id}')" class="w-full py-1.5 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition">
+            View Treatments & Symptoms
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function filterEncyclopedia(species) {
+      document.querySelectorAll('#species-filter-container button').forEach(b => {
+        b.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+      });
+      event.target.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white';
+
+      if (species === 'all') {
+        renderEncyclopediaCards(allDiseaseClasses);
+      } else {
+        const filtered = allDiseaseClasses.filter(c => c.plant_name.toLowerCase().includes(species.toLowerCase()));
+        renderEncyclopediaCards(filtered);
+      }
+    }
+
+    async function viewDiseaseDetail(classId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/disease/classes/${classId}`);
+        if (!res.ok) return;
+        const d = await res.json();
+
+        const container = document.getElementById('disease-result-container');
+        container.innerHTML = `
+          <div class="glass rounded-2xl p-7 shadow-2xl border border-emerald-300">
+            <div class="flex items-start justify-between pb-4 mb-4 border-b border-slate-100">
+              <div>
+                <span class="text-xs font-bold uppercase text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded">${d.plant_name}</span>
+                <h3 class="text-2xl font-extrabold text-slate-900 mt-1">${d.disease_name}</h3>
+                <p class="text-xs text-slate-500">Pathogen: ${d.pathogen_type} · Severity: ${d.severity}</p>
+              </div>
+              <button onclick="document.getElementById('disease-result-container').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <div class="mb-5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Diagnostic Symptoms</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">${d.symptoms}</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+              <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                <h5 class="font-bold text-emerald-900 text-xs uppercase mb-1.5 flex items-center gap-1.5"><i data-lucide="leaf" class="w-3.5 h-3.5 text-emerald-600"></i> Organic / Bio Control</h5>
+                <p class="text-xs text-emerald-800 leading-relaxed">${d.treatments.organic}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-100">
+                <h5 class="font-bold text-blue-900 text-xs uppercase mb-1.5 flex items-center gap-1.5"><i data-lucide="shield" class="w-3.5 h-3.5 text-blue-600"></i> Chemical Treatment</h5>
+                <p class="text-xs text-blue-800 leading-relaxed">${d.treatments.chemical}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-100">
+                <h5 class="font-bold text-amber-900 text-xs uppercase mb-1.5 flex items-center gap-1.5"><i data-lucide="sun" class="w-3.5 h-3.5 text-amber-600"></i> Cultural / Prevention</h5>
+                <p class="text-xs text-amber-800 leading-relaxed">${d.treatments.cultural}</p>
+              </div>
+            </div>
+          </div>
+        `;
+        container.classList.remove('hidden');
+        lucide.createIcons();
+        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (err) {
+        notify('Failed to load disease details', 'error');
+      }
+    }
+
+    // ---------------- PREDICTION HISTORY ----------------
+    async function loadHistoryData() {
+      const tbody = document.getElementById('history-table-body');
+      tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400 text-xs"><span class="spinner inline-block mr-2 border-slate-300 border-t-slate-600"></span>Loading records from database...</td></tr>`;
+
+      try {
+        const headers = {};
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/history`, { headers });
+        if (!res.ok) throw new Error('Could not load history');
+        allHistoryRecords = await res.json();
+        renderHistoryRows(allHistoryRecords);
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500 text-xs">Failed to load history: <span data-history-error></span></td></tr>';
+        tbody.querySelector('[data-history-error]').textContent = err.message;
+      }
+    }
+
+    function renderHistoryRows(records) {
+      const tbody = document.getElementById('history-table-body');
+      if (!records || records.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center">
+              <div class="max-w-sm mx-auto text-center">
+                <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                  <i data-lucide="inbox" class="w-6 h-6"></i>
+                </div>
+                <p class="font-bold text-slate-700 text-sm">No prediction records found</p>
+                <p class="text-xs text-slate-400 mt-1 mb-4">Run a Crop Recommendation or Foliar Disease Scan to start recording history.</p>
+                <button onclick="showTab('crop')" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-700 transition">
+                  Get Recommendation
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = records.map((r, recordIndex) => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="px-6 py-4 text-xs text-slate-500 whitespace-nowrap">${r.date}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${r.type === 'crop' ? (r.path === 'guided_no_soil' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') : 'bg-blue-100 text-blue-800'}">
+              ${r.type === 'crop' ? (r.path === 'guided_no_soil' ? 'Guidance' : 'ML Crop') : 'Disease Scan'}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-xs font-medium text-slate-700">
+            ${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk}` : `Location: <span data-history-location="${recordIndex}"></span>`) : `<span data-history-plant="${recordIndex}"></span>: <span data-history-filename="${recordIndex}"></span>`}
+          </td>
+          <td class="px-6 py-4 text-xs font-bold text-slate-900">${r.crop || r.disease}</td>
+          <td class="px-6 py-4 text-xs">
+            ${r.confidence ? `<span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">${r.confidence}%</span>` : `<span class="text-slate-400">Rule Match</span>`}
+          </td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="deleteHistoryRecord(${r.id}, '${r.type}')" title="Delete Record" class="text-slate-400 hover:text-rose-600 transition p-1.5 rounded-lg hover:bg-rose-50">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      records.forEach((record, recordIndex) => {
+        if (record.type === 'disease') {
+          const plantElement = tbody.querySelector(`[data-history-plant="${recordIndex}"]`);
+          const filenameElement = tbody.querySelector(`[data-history-filename="${recordIndex}"]`);
+          if (plantElement) plantElement.textContent = record.plant || '';
+          if (filenameElement) filenameElement.textContent = record.filename || 'Leaf Image';
+        } else {
+          const locationElement = tbody.querySelector(`[data-history-location="${recordIndex}"]`);
+          if (locationElement) locationElement.textContent = record.location || '';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function filterHistoryTable() {
+      const q = (document.getElementById('history-search-input').value || '').toLowerCase().trim();
+      let filtered = allHistoryRecords;
+
+      if (currentHistoryFilter !== 'all') {
+        filtered = filtered.filter(r => r.type === currentHistoryFilter);
+      }
+
+      if (q) {
+        filtered = filtered.filter(r =>
+          (r.crop && r.crop.toLowerCase().includes(q)) ||
+          (r.disease && r.disease.toLowerCase().includes(q)) ||
+          (r.plant && r.plant.toLowerCase().includes(q)) ||
+          (r.date && r.date.toLowerCase().includes(q)) ||
+          (r.location && r.location.toLowerCase().includes(q))
+        );
+      }
+      renderHistoryRows(filtered);
+    }
+
+    function setHistoryFilter(type) {
+      currentHistoryFilter = type;
+      document.querySelectorAll('#history-type-filters button').forEach(b => {
+        b.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+      });
+      event.target.className = 'px-3 py-1 rounded-md text-xs font-semibold bg-emerald-600 text-white';
+      filterHistoryTable();
+    }
+
+    async function deleteHistoryRecord(id, type) {
+      if (!confirm('Are you sure you want to delete this prediction record from the database?')) return;
+      try {
+        const headers = {};
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/history/${id}?record_type=${type}`, {
+          method: 'DELETE',
+          headers
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Deletion failed. You can only delete records you created.');
+        }
+        notify('Record deleted successfully from database', 'success');
+        loadHistoryData();
+        loadAnalyticsData();
+      } catch (err) {
+        notify(err.message, 'error');
+      }
+    }
+
+    function exportHistoryCSV() {
+      if (!allHistoryRecords || allHistoryRecords.length === 0) {
+        notify('No history records available to export.', 'info');
+        return;
+      }
+      let csv = 'ID,Date,Type,Field Inputs,Predicted Result,Model Score\n';
+      allHistoryRecords.forEach(r => {
+        const inputField = r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk}` : r.location) : r.filename;
+        const resultVal = r.crop || r.disease;
+        const confVal = r.confidence ? `${r.confidence}%` : 'Rule Guidance';
+        csv += `"${r.id}","${r.date}","${r.type}","${inputField}","${resultVal}","${confVal}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `krishivision_prediction_history_${new Date().toISOString().slice(0,10)}.csv`);
+      a.click();
+      notify('Exported history as CSV file.', 'success');
+    }
+
+    // ---------------- ANALYTICS ----------------
+    async function loadAnalyticsData() {
+      try {
+        const headers = {};
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+
+        const res = await fetch(`${API_BASE}/api/analytics/summary`, { headers });
+        if (!res.ok) return;
+        const d = await res.json();
+
+        // Update KPI metrics on Dashboard
+        document.getElementById('dash-kpi-predictions').textContent = d.total_crop_predictions;
+        document.getElementById('dash-kpi-disease-scans').textContent = d.total_disease_scans;
+        document.getElementById('dash-kpi-soil-health').textContent = d.total_crop_predictions > 0 ? `${d.average_soil_health_index}%` : 'Awaiting Test';
+        document.getElementById('dash-soil-badge').textContent = d.total_crop_predictions > 0 ? 'Active' : 'No Data';
+
+        // Update Analytics Tab Count
+        document.getElementById('analytics-crop-records-count').textContent = `${d.total_crop_predictions} Field Records`;
+
+        // Render Crop Distribution Horizontal Bars
+        const cropDistContainer = document.getElementById('crop-dist-chart');
+        if (!d.crop_distribution || d.crop_distribution.length === 0) {
+          cropDistContainer.innerHTML = `
+            <div class="py-8 text-center text-slate-400 text-xs">
+              <i data-lucide="pie-chart" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+              No crop predictions in database yet.<br>Run a crop recommendation to generate distribution analytics.
+            </div>
+          `;
+        } else {
+          cropDistContainer.innerHTML = d.crop_distribution.map(c => `
+            <div>
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span>${c.crop}</span>
+                <span class="text-emerald-700 font-bold">${c.percentage}% (${c.count} ${c.count === 1 ? 'record' : 'records'})</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-700" style="width:${c.percentage}%; background: linear-gradient(90deg, var(--mint), var(--mint-dark));"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Render Soil Averages Bars
+        const soilContainer = document.getElementById('soil-averages-bars');
+        const s = d.soil_averages;
+        if (d.total_crop_predictions === 0 || (s.n === 0 && s.p === 0 && s.k === 0)) {
+          soilContainer.innerHTML = `
+            <div class="py-8 text-center text-slate-400 text-xs">
+              <i data-lucide="gauge" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+              No soil reports submitted yet.<br>Enter N-P-K parameters in Path A to view benchmark nutrient levels.
+            </div>
+          `;
+        } else {
+          soilContainer.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span class="flex items-center gap-2">
+                  <span>Nitrogen (N) — ${s.n} kg/ha</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${s.n < 50 ? 'bg-amber-100 text-amber-800' : s.n <= 110 ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">${s.n < 50 ? 'Low Deficient' : s.n <= 110 ? 'Optimal' : 'High'}</span>
+                </span>
+                <span class="text-slate-400">Target: 60-100 kg/ha</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full bg-emerald-500" style="width:${Math.min(100, (s.n / 140) * 100)}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span class="flex items-center gap-2">
+                  <span>Phosphorus (P) — ${s.p} kg/ha</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${s.p < 30 ? 'bg-amber-100 text-amber-800' : s.p <= 70 ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">${s.p < 30 ? 'Low Deficient' : s.p <= 70 ? 'Optimal' : 'High'}</span>
+                </span>
+                <span class="text-slate-400">Target: 30-60 kg/ha</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full bg-blue-500" style="width:${Math.min(100, (s.p / 145) * 100)}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span class="flex items-center gap-2">
+                  <span>Potassium (K) — ${s.k} kg/ha</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${s.k < 30 ? 'bg-amber-100 text-amber-800' : s.k <= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">${s.k < 30 ? 'Low Deficient' : s.k <= 80 ? 'Optimal' : 'High'}</span>
+                </span>
+                <span class="text-slate-400">Target: 30-70 kg/ha</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full bg-purple-500" style="width:${Math.min(100, (s.k / 205) * 100)}%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                <span class="flex items-center gap-2">
+                  <span>Soil pH — ${s.ph}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${s.ph < 6.0 ? 'bg-amber-100 text-amber-800' : s.ph <= 7.5 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${s.ph < 6.0 ? 'Acidic' : s.ph <= 7.5 ? 'Optimal Neutral' : 'Alkaline'}</span>
+                </span>
+                <span class="text-slate-400">Target: 6.5–7.5</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full bg-amber-500" style="width:${Math.min(100, (s.ph / 10) * 100)}%;"></div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Dynamic Narrative Summary
+        const summaryElem = document.getElementById('analytics-farm-summary');
+        if (d.total_crop_predictions === 0) {
+          summaryElem.textContent = 'Welcome! No field soil tests have been submitted to your farm profile yet. Once you submit a soil report in Path A, कृषिVision will compute real-time soil acidity, nutrient replenishment targets, and crop diversity indexes here.';
+        } else {
+          let phAdvice = s.ph < 6.0 ? 'Your soil is acidic (pH < 6.0); consider applying agricultural lime or dolomite.' :
+                         s.ph > 7.5 ? 'Your soil is alkaline (pH > 7.5); consider applying gypsum and organic compost.' :
+                         'Your soil pH is optimal and neutral (6.5–7.5), providing excellent nutrient bioavailability for both cereal and legume rotations.';
+          summaryElem.textContent = `Based on your ${d.total_crop_predictions} registered field prediction(s), your average soil pH is ${s.ph}. ${phAdvice} Average nitrogen is ${s.n} kg/ha and seasonal rainfall is ${s.rainfall} mm.`;
+        }
+
+        lucide.createIcons();
+      } catch (err) {
+        console.warn('Analytics update error:', err);
+      }
+    }
+
+    // ---------------- DASHBOARD DATA ----------------
+    async function loadDashboardData() {
+      // Dynamic Greeting
+      const hour = new Date().getHours();
+      const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      const name = currentUser ? (currentUser.full_name || currentUser.username) : 'Farmer';
+      document.getElementById('dash-greeting-text').textContent = `${timeGreeting}, ${name} — welcome to`;
+
+      // Update location KPI
+      if (currentUser) {
+        document.getElementById('dash-kpi-location').textContent = currentUser.farm_location || 'Jharkhand, India';
+        document.getElementById('dash-kpi-holding').textContent = `${currentUser.farm_size_hectares || 2.5} Hectares Landholding`;
+      } else {
+        document.getElementById('dash-kpi-location').textContent = 'Guest Mode';
+        document.getElementById('dash-kpi-holding').textContent = 'Click to sign in';
+      }
+
+      // Recent Activity Feed
+      const container = document.getElementById('dash-recent-activity-container');
+      try {
+        const headers = {};
+        if (currentAuthToken) headers['Authorization'] = `Bearer ${currentAuthToken}`;
+        const res = await fetch(`${API_BASE}/api/history`, { headers });
+        if (res.ok) {
+          const recs = await res.json();
+          if (!recs || recs.length === 0) {
+            container.innerHTML = `
+              <div class="py-6 text-center text-slate-400 text-xs">
+                🌱 No predictions logged yet. Run your first Soil Recommendation or Plant Scan to view real-time farm activity.
+              </div>
+            `;
+          } else {
+            container.innerHTML = `
+              <div class="divide-y divide-slate-100">
+                ${recs.slice(0, 4).map((r, recordIndex) => `
+                  <div class="py-3 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg ${r.type === 'crop' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'} flex items-center justify-center font-bold">
+                        <i data-lucide="${r.type === 'crop' ? 'sprout' : 'camera'}" class="w-4 h-4"></i>
+                      </div>
+                      <div>
+                        <p class="font-bold text-slate-900">${r.crop || r.disease}</p>
+                        <p class="text-slate-400 text-[10px]">${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk} · ${r.rainfall}` : `<span data-dashboard-location="${recordIndex}"></span>`) : `<span data-dashboard-filename="${recordIndex}"></span>`}</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px]">${r.confidence ? `${r.confidence}%` : 'Guidance'}</span>
+                      <p class="text-slate-400 text-[10px] mt-0.5">${r.date}</p>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+            recs.slice(0, 4).forEach((record, recordIndex) => {
+              if (record.type === 'disease') {
+                const filenameElement = container.querySelector(`[data-dashboard-filename="${recordIndex}"]`);
+                if (filenameElement) filenameElement.textContent = record.filename || '';
+              } else if (record.npk === 'N/A') {
+                const locationElement = container.querySelector(`[data-dashboard-location="${recordIndex}"]`);
+                if (locationElement) locationElement.textContent = record.location || '';
+              }
+            });
+            lucide.createIcons();
+          }
+        }
+      } catch (e) {
+        console.warn('Dashboard activity error:', e);
+      }
+    }
+
+    // ---------------- FARMER PROFILE ----------------
+    async function saveProfileChanges() {
+      if (!currentAuthToken) {
+        notify('Please sign in or create an account to save your profile changes.', 'error');
+        openAuthModal();
+        return;
+      }
+      const btn = document.getElementById('btn-save-profile');
+      btn.disabled = true;
+      btn.textContent = 'Saving Changes...';
+
+      const payload = {
+        full_name: document.getElementById('edit-fullname').value,
+        farm_location: document.getElementById('edit-location').value,
+        farm_size_hectares: parseFloat(document.getElementById('edit-size').value) || 2.5,
+        phone_number: document.getElementById('edit-phone').value
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to update profile');
+        const updatedUser = await res.json();
+        currentUser = updatedUser;
+        updateUserUI(updatedUser);
+        loadDashboardData();
+        notify('Farm profile updated successfully in SQLite database!', 'success');
+      } catch (err) {
+        notify(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Farm Profile Changes';
+      }
+    }
+
+    async function logoutFarmer() {
+      let revoked = !currentAuthToken;
+      if (currentAuthToken) {
+        try {
+          const response = await fetch(`${API_BASE}/api/auth/logout`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+          });
+          revoked = response.ok;
+        } catch (err) {
+          revoked = false;
+        }
+      }
+      localStorage.removeItem('krishi_auth_token');
+      currentAuthToken = null;
+      currentUser = null;
+      updateUserUI(null);
+      loadDashboardData();
+      loadAnalyticsData();
+      loadHistoryData();
+      notify(
+        revoked
+          ? 'You have been signed out. Switched to Guest Mode.'
+          : 'Signed out locally, but the server could not revoke this token. It may remain valid until it expires.',
+        revoked ? 'info' : 'error'
+      );
+    }
+
+    // ---------------- AUTH MODAL & AUTHENTICATION ----------------
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+    function switchModalTab(tab) {
+      const loginTab = document.getElementById('modal-tab-login');
+      const regTab = document.getElementById('modal-tab-register');
+      const formLogin = document.getElementById('form-login');
+      const formRegister = document.getElementById('form-register');
+
+      if (tab === 'login') {
+        loginTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition';
+        regTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition';
+        formLogin.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+      } else {
+        regTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition';
+        loginTab.className = 'flex-1 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition';
+        formRegister.classList.remove('hidden');
+        formLogin.classList.add('hidden');
+      }
+    }
+
+    async function submitLogin() {
+      const uname = document.getElementById('login-username').value;
+      const pwd = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login-submit');
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: uname, password: pwd })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Login failed');
+        }
+
+        const data = await res.json();
+        currentAuthToken = data.access_token;
+        localStorage.setItem('krishi_auth_token', currentAuthToken);
+        currentUser = data.user;
+        updateUserUI(data.user);
+        closeAuthModal();
+        notify(`Welcome back, ${data.user.full_name || data.user.username}!`, 'success');
+        loadDashboardData();
+        loadAnalyticsData();
+        loadHistoryData();
+      } catch (err) {
+        notify(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    async function submitRegister() {
+      const payload = {
+        username: document.getElementById('reg-username').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        full_name: document.getElementById('reg-name').value || null,
+        farm_location: document.getElementById('reg-location').value || 'Jharkhand, India',
+        farm_size_hectares: parseFloat(document.getElementById('reg-size').value) || 2.5
+      };
+
+      const btn = document.getElementById('btn-register-submit');
+      btn.disabled = true;
+      btn.textContent = 'Creating Account...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Registration failed');
+        }
+
+        const data = await res.json();
+        currentAuthToken = data.access_token;
+        localStorage.setItem('krishi_auth_token', currentAuthToken);
+        currentUser = data.user;
+        updateUserUI(data.user);
+        closeAuthModal();
+        notify(`Account created successfully! Welcome, ${data.user.username}.`, 'success');
+        loadDashboardData();
+        loadAnalyticsData();
+        loadHistoryData();
+      } catch (err) {
+        notify(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    async function updateUserUI(user) {
+      const btnLogout = document.getElementById('btn-logout');
+      if (!user) {
+        document.getElementById('user-avatar-initials').textContent = 'GM';
+        document.getElementById('user-display-name').textContent = 'Guest Farmer';
+        document.getElementById('user-role-badge').textContent = 'Guest Mode';
+        document.getElementById('auth-action-btn').textContent = 'Sign In';
+
+        document.getElementById('profile-card-avatar').textContent = 'GM';
+        document.getElementById('profile-card-name').textContent = 'Guest Farmer';
+        document.getElementById('profile-card-location').textContent = 'Not Signed In';
+        document.getElementById('profile-card-tag').textContent = 'Guest Mode';
+
+        document.getElementById('profile-view-username').textContent = 'None';
+        document.getElementById('profile-view-email').textContent = 'None';
+        document.getElementById('profile-view-phone').textContent = 'None';
+        const predEl = document.getElementById('profile-view-predictions');
+        if (predEl) predEl.textContent = '0 Records';
+        const memberEl = document.getElementById('profile-view-member-since');
+        if (memberEl) memberEl.textContent = 'Guest Session';
+
+        document.getElementById('edit-fullname').value = '';
+        document.getElementById('edit-location').value = '';
+        document.getElementById('edit-size').value = '';
+        document.getElementById('edit-phone').value = '';
+        if (btnLogout) btnLogout.classList.add('hidden');
+        return;
+      }
+
+      const initials = (user.full_name || user.username).split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('user-avatar-initials').textContent = initials;
+      document.getElementById('user-display-name').textContent = user.full_name || user.username;
+      document.getElementById('user-role-badge').textContent = user.farm_location || 'Farmer';
+      document.getElementById('auth-action-btn').textContent = 'Switch';
+
+      document.getElementById('profile-card-avatar').textContent = initials;
+      document.getElementById('profile-card-name').textContent = user.full_name || user.username;
+      document.getElementById('profile-card-location').textContent = `${user.farm_location || 'India'} · ${user.farm_size_hectares || 2.5} Ha`;
+      document.getElementById('profile-card-tag').textContent = 'Authenticated Farmer';
+
+      document.getElementById('profile-view-username').textContent = user.username;
+      document.getElementById('profile-view-email').textContent = user.email;
+      document.getElementById('profile-view-phone').textContent = user.phone_number || 'Not Set';
+
+      // Fetch dynamic user stats from backend
+      try {
+        const statsRes = await fetch(`${API_BASE}/api/auth/stats`, {
+          headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+        });
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          const predEl = document.getElementById('profile-view-predictions');
+          if (predEl) predEl.textContent = `${stats.total_crop_predictions} Crops · ${stats.total_disease_scans} Scans`;
+          const memberEl = document.getElementById('profile-view-member-since');
+          if (memberEl) memberEl.textContent = stats.member_since;
+        }
+      } catch (e) {
+        console.warn('Could not fetch user stats:', e);
+      }
+
+      // Fill edit form
+      document.getElementById('edit-fullname').value = user.full_name || '';
+      document.getElementById('edit-location').value = user.farm_location || '';
+      document.getElementById('edit-size').value = user.farm_size_hectares || 2.5;
+      document.getElementById('edit-phone').value = user.phone_number || '';
+      if (btnLogout) btnLogout.classList.remove('hidden');
+    }
+
+    async function submitChangePassword() {
+      if (!currentAuthToken) {
+        notify('Please sign in to change password.', 'error');
+        openAuthModal();
+        return;
+      }
+      const curr = document.getElementById('curr-password').value;
+      const newP = document.getElementById('new-password').value;
+      const conf = document.getElementById('confirm-password').value;
+
+      if (!curr || !newP) {
+        notify('Please enter both current and new passwords.', 'error');
+        return;
+      }
+      if (newP.length < 6) {
+        notify('New password must be at least 6 characters.', 'error');
+        return;
+      }
+      if (newP !== conf) {
+        notify('New password confirmation does not match.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-change-pw');
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify({ current_password: curr, new_password: newP })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Password update failed');
+        }
+
+        document.getElementById('curr-password').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+        localStorage.removeItem('krishi_auth_token');
+        currentAuthToken = null;
+        currentUser = null;
+        updateUserUI(null);
+        loadDashboardData();
+        loadAnalyticsData();
+        loadHistoryData();
+        notify('Password updated. Previous sessions were revoked; please sign in again.', 'success');
+      } catch (err) {
+        notify(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
+      }
+    }
+
+    // ---------------- APP INITIALIZATION & HEALTH CHECK ----------------
+    async function initApp() {
+      // E-03: Real health check evaluating status response
+      try {
+        const res = await fetch(`${API_BASE}/api/health`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'ok') {
+            document.getElementById('dash-system-status').textContent = 'Backend & ML Online';
+            document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+          } else {
+            document.getElementById('dash-system-status').textContent = 'System Degraded';
+            document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+          }
+        } else {
+          document.getElementById('dash-system-status').textContent = 'System Degraded';
+          document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+        }
+      } catch (e) {
+        document.getElementById('dash-system-status').textContent = 'Backend Offline';
+        document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+      }
+
+      // E-04: Align demo button with backend demo-status configuration
+      try {
+        const demoRes = await fetch(`${API_BASE}/api/auth/demo-status`);
+        if (demoRes.ok) {
+          const demoInfo = await demoRes.json();
+          const demoBtn = document.getElementById('btn-demo-login');
+          if (demoBtn) {
+            if (demoInfo.demo_enabled) {
+              demoBtn.classList.remove('hidden');
+              demoBtn.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i> <span data-demo-login-label></span>';
+              demoBtn.querySelector('[data-demo-login-label]').textContent = `Demo Login: ${demoInfo.demo_username || 'Demo User'} (1-Click)`;
+              lucide.createIcons();
+            } else {
+              demoBtn.classList.add('hidden');
+            }
+          }
+        }
+      } catch (demoErr) {
+        // If endpoint unreachable, keep button state unchanged
+      }
+
+      // Check current auth profile if token exists
+      if (currentAuthToken) {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+          });
+          if (res.ok) {
+            currentUser = await res.json();
+            updateUserUI(currentUser);
+          } else {
+            localStorage.removeItem('krishi_auth_token');
+            currentAuthToken = null;
+            updateUserUI(null);
+          }
+        } catch (e) {
+          updateUserUI(null);
+        }
+      } else {
+        updateUserUI(null);
+      }
+
+      loadDashboardData();
+      loadAnalyticsData();
+      loadHistoryData();
+      loadDiseaseEncyclopedia();
+    }
+
+    // ---------------- NOTIFICATION SYSTEM ----------------
+    function notify(message, type = 'info') {
+      const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-triangle' : 'info';
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        const toast = document.createElement('div');
+        const bgClass = type === 'success' ? 'bg-emerald-900/90 text-white border-emerald-500/50' :
+                        type === 'error' ? 'bg-rose-900/90 text-white border-rose-500/50' :
+                        'bg-slate-900/90 text-white border-slate-600/50';
+        toast.className = `toast-item px-4 py-3 rounded-2xl border backdrop-blur-md flex items-center justify-between gap-3 text-xs font-semibold ${bgClass}`;
+
+        const toastContent = document.createElement('div');
+        toastContent.className = 'flex items-center gap-2.5';
+        const toastIcon = document.createElement('i');
+        toastIcon.dataset.lucide = iconName;
+        toastIcon.className = 'w-4 h-4 shrink-0 text-emerald-400';
+        const toastMessage = document.createElement('span');
+        toastMessage.textContent = String(message);
+        toastContent.append(toastIcon, toastMessage);
+
+        const dismissButton = document.createElement('button');
+        dismissButton.type = 'button';
+        dismissButton.className = 'text-white/60 hover:text-white';
+        dismissButton.textContent = '×';
+        dismissButton.addEventListener('click', () => toast.remove());
+
+        toast.append(toastContent, dismissButton);
+        toastContainer.appendChild(toast);
+        lucide.createIcons();
+        setTimeout(() => {
+          toast.style.transition = 'all 0.3s ease';
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      }
+
+      const banner = document.getElementById('status-banner');
+      const content = document.getElementById('status-banner-content');
+      if (banner && content) {
+        banner.className = `mb-6 rounded-xl p-4 flex items-center justify-between text-sm transition shadow-lg ${
+          type === 'success' ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' :
+          type === 'error' ? 'bg-rose-50 text-rose-900 border border-rose-200' :
+          'bg-blue-50 text-blue-900 border border-blue-200'
+        }`;
+        content.replaceChildren();
+        const bannerIcon = document.createElement('i');
+        bannerIcon.dataset.lucide = iconName;
+        bannerIcon.className = 'w-5 h-5 shrink-0';
+        const bannerMessage = document.createElement('span');
+        bannerMessage.textContent = String(message);
+        content.append(bannerIcon, bannerMessage);
+        banner.classList.remove('hidden');
+        lucide.createIcons();
+        setTimeout(() => { banner.classList.add('hidden'); }, 6000);
+      }
+    }
+
+    function dismissStatusBanner() {
+      document.getElementById('status-banner').classList.add('hidden');
+    }
+  </script>
 </body>
 </html>

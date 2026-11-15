@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hLeafLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="hLeafRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800&amp;family=Tiro+Devanagari+Hindi&amp;display=swap');
+    .h-hindi {
+      font-family: 'Tiro Devanagari Hindi', 'Noto Sans Devanagari', 'Mangal', 'Segoe UI', serif;
+      font-weight: 700;
+      font-size: 34px;
+      fill: #ffffff;
+    }
+    .h-english {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 800;
+      font-size: 34px;
+      fill: #10b981;
+    }
+    .h-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      fill: #a7f3d0;
+      opacity: 0.8;
+    }
+  </style>
+
+  <!-- Leaf Emblem on Left -->
+  <g transform="translate(42, 40) scale(0.48)">
+    <path d="M 0,-65 C -45,-35 -55,15 -18,48 C -6,58 0,62 0,62 C 0,62 6,58 18,48 C -15,20 -10,-25 0,-65 Z" fill="url(#hLeafLeft)" />
+    <path d="M 0,-65 C 10,-25 15,20 -18,48 C 0,62 0,62 0,62 C 0,62 25,45 42,15 C 55,-10 35,-48 0,-65 Z" fill="url(#hLeafRight)" />
+    <path d="M 0,-55 Q -2,0 0,60" stroke="#6ee7b7" stroke-width="4" stroke-linecap="round" fill="none" />
+    <circle cx="0" cy="-55" r="5" fill="#fbbf24" />
+  </g>
+
+  <!-- Typography -->
+  <text x="82" y="44">
+    <tspan class="h-hindi">कृषि</tspan><tspan class="h-english">Vision</tspan>
+  </text>
+  <text x="84" y="62" class="h-tag">AI FARMING SUITE</text>
+</svg>

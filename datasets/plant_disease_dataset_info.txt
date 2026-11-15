@@ -1,0 +1,18 @@
+PlantVillage Dataset Information for कृषिVision
+=================================================
+Source: PlantVillage Dataset (CrowdAI / Penn State University benchmark)
+Reference Archive: ml/plant_disease/dataset.zip (85.2 MB)
+Total Images in Split: 54,305 images across train, validation, and test splits.
+
+Supported 27 Focused Minor Project Classes:
+- Tomato (10 classes): Bacterial Spot, Early Blight, Late Blight, Leaf Mold, Septoria Leaf Spot, Two-Spotted Spider Mites, Target Spot, Tomato Yellow Leaf Curl Virus, Tomato Mosaic Virus, Healthy.
+- Potato (3 classes): Early Blight, Late Blight, Healthy.
+- Corn / Maize (4 classes): Cercospora Gray Leaf Spot, Common Rust, Northern Leaf Blight, Healthy.
+- Apple (4 classes): Apple Scab, Black Rot, Cedar Apple Rust, Healthy.
+- Grape (4 classes): Black Rot, Esca (Black Measles), Leaf Blight (Isariopsis), Healthy.
+- Bell Pepper (2 classes): Bacterial Spot, Healthy.
+
+Scripts Provided in backend/app/ml/plant_disease/:
+- prepare_dataset.py: Splits raw color images into 70/15/15 train/val/test splits.
+- verify_dataset.py: Performs directory and integrity audits across splits.
+- test_dataloader.py: TensorFlow/Keras dataloader benchmark with MobileNetV2 preprocessing.

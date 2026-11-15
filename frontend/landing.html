@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>कृषिVision — Intelligent Crop Recommendation and Plant Disease Detection</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+  :root {
+    --deep: #071f18;
+    --deep-2: #0c2b22;
+    --mint: #10b981;
+    --mint-dark: #059669;
+    --mint-light: #34d399;
+  }
+  * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  .hindi { font-family: 'Tiro Devanagari Hindi', 'Noto Sans Devanagari', 'Mangal', serif; }
+
+  .glass-nav {
+    background: rgba(7, 31, 24, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 30px -10px rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .hero-glow {
+    background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.22) 0%, rgba(7, 31, 24, 0) 70%);
+  }
+
+  .badge-glow {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+  }
+</style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="fixed top-0 inset-x-0 z-50 glass-nav transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo: Green Leaf Symbol strictly ABOVE कृषिVision text -->
+      <a href="/" class="flex flex-col items-center justify-center group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-400/30 group-hover:scale-105 transition">
+          <img src="/assets/favicon.svg" alt="कृषिVision Emblem" class="w-5 h-5 drop-shadow" />
+        </div>
+        <div class="mt-0.5 text-center leading-none">
+          <span class="text-white font-extrabold text-lg tracking-tight">
+            <span class="hindi font-bold">कृषि</span><span style="color:var(--mint);">Vision</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-emerald-100/80">
+        <a href="#features" class="hover:text-emerald-400 transition">Features</a>
+        <a href="#pathways" class="hover:text-emerald-400 transition">Dual Pathways</a>
+        <a href="#disease" class="hover:text-emerald-400 transition">Disease Vision</a>
+        <a href="#how-it-works" class="hover:text-emerald-400 transition">How It Works</a>
+        <a href="#encyclopedia" class="hover:text-emerald-400 transition">Treatments</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="/app" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-emerald-200 hover:text-white hover:bg-white/10 transition border border-emerald-500/30">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i> Farmer Sign In
+        </a>
+        <a href="/app" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:brightness-110 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+          <span>Launch Portal</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden" style="background: var(--deep);">
+    <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      
+      <!-- Top Pill Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-semibold mb-6 badge-glow">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
+        <span>Next-Gen Agricultural Intelligence · B.Tech CSE Project</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto">
+        Intelligent Farming Decisions with <br class="hidden sm:block"/>
+        <span class="hindi text-emerald-400">कृषि</span><span style="color:var(--mint-light);">Vision</span> AI Platform
+      </h1>
+
+      <p class="mt-6 text-base sm:text-lg text-emerald-100/70 max-w-2xl mx-auto leading-relaxed">
+        Empowering Indian agriculture with trained <strong>Random Forest</strong> crop matchmaking from 7 soil chemistry parameters, paired with <strong>Foliar Vision Diagnostics</strong> across 27 conditions with organic and chemical treatment protocols.
+      </p>
+
+      <!-- Primary Action Buttons -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+        <a href="/app" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-sm font-bold text-white shadow-xl shadow-emerald-600/30 hover:brightness-110 transition transform hover:-translate-y-0.5" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Open Farmer Portal</span>
+        </a>
+        <a href="/app" onclick="localStorage.setItem('krishi_target_tab', 'crop')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-sm font-bold text-emerald-100 bg-white/10 hover:bg-white/15 border border-white/20 transition">
+          <i data-lucide="sprout" class="w-4 h-4 text-emerald-400"></i>
+          <span>Crop Recommendation</span>
+        </a>
+      </div>
+
+      <!-- Key Stats Ribbon -->
+      <div class="mt-16 pt-12 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">22</p>
+          <p class="text-xs text-emerald-200/70 font-medium mt-1">Crops Supported</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">27</p>
+          <p class="text-xs text-emerald-200/70 font-medium mt-1">Disease Pathologies</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">7</p>
+          <p class="text-xs text-emerald-200/70 font-medium mt-1">Soil Chemistry Metrics</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">100%</p>
+          <p class="text-xs text-emerald-200/70 font-medium mt-1">Scientific Integrity</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= DUAL PATHWAYS SECTION ================= -->
+  <section id="pathways" class="py-20 bg-slate-50 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+          Agricultural Decision Science
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          Dual-Pathway Crop Recommendation
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 mt-2">
+          Designed for real-world Indian agricultural realities: caters both to farmers with lab soil test reports and those with field observations.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Path A Card -->
+        <div class="glass-card rounded-3xl p-8 border-2 border-emerald-500/30 relative overflow-hidden">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-6 shadow-md shadow-emerald-500/20">
+            <i data-lucide="file-check" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-md">
+            Pathway A · Trained Machine Learning
+          </span>
+          <h3 class="text-2xl font-bold text-slate-900 mt-3">Laboratory Soil Report Available</h3>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Harnesses an optimized <strong>Random Forest Ensemble (100 estimators)</strong> trained on ICAR benchmark agronomic data. Evaluates 7 core chemical & meteorological variables:
+          </p>
+
+          <div class="mt-6 grid grid-cols-2 gap-2.5 text-xs text-slate-700 font-medium">
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Nitrogen (N, 0–140)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Phosphorus (P, 5–145)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Potassium (K, 5–205)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Soil pH (3.5–10.0)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Temperature (°C)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Relative Humidity (%)</div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Output: Top Crop + 3 Alternatives</span>
+            <a href="/app" class="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
+              Try Path A &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Path B Card -->
+        <div class="glass-card rounded-3xl p-8 border-2 border-amber-500/30 relative overflow-hidden">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center mb-6 shadow-md shadow-amber-500/20">
+            <i data-lucide="compass" class="w-6 h-6"></i>
+          </div>
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md">
+            Pathway B · Guided Agro-Climatic Rules
+          </span>
+          <h3 class="text-2xl font-bold text-slate-900 mt-3">No Laboratory Soil Report Yet</h3>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Provides rule-based agronomic guidance using field observations when laboratory testing is not yet complete. Strictly non-misleading: does not generate fake ML confidence numbers.
+          </p>
+
+          <div class="mt-6 grid grid-cols-2 gap-2.5 text-xs text-slate-700 font-medium">
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Indian State / Region</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Growing Season (Kharif/Rabi)</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Water & Irrigation Source</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Observable Soil Texture</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Previous Field Crop</div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-600"></i> Soil Health Card Guide</div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Output: Region-Matched Recommendations</span>
+            <a href="/app" class="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1">
+              Try Path B &rarr;
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= PLANT DISEASE VISION ================= -->
+  <section id="disease" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-100 px-3 py-1 rounded-full">
+            Foliar Computer Vision
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+            Plant Leaf Disease Detection & 3-Tier Treatment Protocols
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600 mt-4 leading-relaxed">
+            Early detection of plant pathologies is vital to preventing devastating crop yield loss. कृषिVision features an image processing pipeline resizing and normalizing leaf photos to <strong>224×224 RGB tensors</strong>, supported by an authoritative 27-class agronomic encyclopedia.
+          </p>
+
+          <div class="mt-8 space-y-4">
+            <div class="flex items-start gap-3.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="leaf" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Tier 1: Organic & Biological Control</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Neem oil formulations, Trichoderma viride bio-fungicides, and beneficial microbial antagonists.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3.5">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Tier 2: Targeted Chemical Fungicides</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Exact dosages for Copper oxychloride, Mancozeb, Chlorothalonil, and systemic fungicides.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3.5">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="sun" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">Tier 3: Cultural & Field Sanitation Practices</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Crop rotation, drip irrigation to prevent foliar wetness, certified seeds, and infected debris removal.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <a href="/app" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold text-white shadow-md transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+              <span>Test Leaf Diagnostics</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Sample Leaf Showcase Card -->
+        <div class="glass-card rounded-3xl p-8 border border-slate-200 shadow-xl">
+          <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+            <div>
+              <span class="text-xs font-bold text-slate-400 uppercase">Interactive Diagnostics</span>
+              <h4 class="text-lg font-bold text-slate-900 mt-0.5">Supported Crop Foliage</h4>
+            </div>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">6 Crop Families</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🍅</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Tomato</p>
+              <p class="text-[10px] text-slate-400">10 Conditions</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🥔</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Potato</p>
+              <p class="text-[10px] text-slate-400">3 Conditions</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🌽</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Corn / Maize</p>
+              <p class="text-[10px] text-slate-400">4 Conditions</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🍎</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Apple</p>
+              <p class="text-[10px] text-slate-400">4 Conditions</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🍇</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Grape</p>
+              <p class="text-[10px] text-slate-400">4 Conditions</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-300 transition">
+              <span class="text-2xl">🫑</span>
+              <p class="text-xs font-bold text-slate-800 mt-1">Bell Pepper</p>
+              <p class="text-[10px] text-slate-400">2 Conditions</p>
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/60 text-xs text-emerald-900 flex items-center justify-between">
+            <span>Includes 1-Click Instant Benchmark Leaf Samples for easy evaluation.</span>
+            <a href="/app" class="font-bold underline ml-2">Try Demo &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how-it-works" class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+          Workflow
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          How कृषिVision Works
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 mt-2">
+          From soil testing to actionable crop yield prescriptions in three simple steps.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="glass-card rounded-3xl p-8 relative">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm mb-5">
+            01
+          </div>
+          <h4 class="text-lg font-bold text-slate-900 mb-2">Input Soil & Weather Data</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Enter your field's Nitrogen, Phosphorus, Potassium, Soil pH, and local weather metrics, or use our quick presets (Rice, Maize, Chickpea, Cotton).
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 relative">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm mb-5">
+            02
+          </div>
+          <h4 class="text-lg font-bold text-slate-900 mb-2">Machine Learning Inference</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            The Random Forest model calculates probabilities across 22 crops, identifying optimal agronomic suitability, nutrient compatibility, and risk factors.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 relative">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm mb-5">
+            03
+          </div>
+          <h4 class="text-lg font-bold text-slate-900 mb-2">Actionable Yield Strategy</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Receive the primary recommended crop, calibrated confidence rating, top alternative rotation options, and automatic SQLite database history logging.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CALL TO ACTION ================= -->
+  <section class="py-16 md:py-24 relative overflow-hidden" style="background: var(--deep);">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      
+      <!-- Emblem ABOVE Brand Name -->
+      <div class="w-14 h-14 mx-auto mb-3 flex items-center justify-center rounded-2xl bg-emerald-500/20 border border-emerald-400/40 shadow-xl">
+        <img src="/assets/favicon.svg" alt="कृषिVision" class="w-9 h-9" />
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white">
+        Start Making Data-Driven Agricultural Decisions
+      </h2>
+      <p class="text-emerald-100/70 text-sm sm:text-base mt-3 max-w-xl mx-auto">
+        Join the digital agriculture revolution. Launch the कृषिVision portal now to run your first crop recommendation or plant leaf diagnostic scan.
+      </p>
+
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/app" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-bold text-white shadow-xl shadow-emerald-500/30 hover:brightness-110 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
+          Launch कृषिVision Portal &rarr;
+        </a>
+        <a href="/docs" target="_blank" class="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-emerald-200 bg-white/10 hover:bg-white/15 border border-white/20 transition">
+          Interactive API Docs (Swagger)
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="py-10 bg-slate-900 text-slate-400 text-xs border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <img src="/assets/favicon.svg" alt="कृषिVision" class="w-4 h-4" />
+        <span class="text-white font-bold"><span class="hindi">कृषि</span><span style="color:var(--mint);">Vision</span></span>
+        <span>· B.Tech CSE 7th Sem Minor Project</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="/app" class="hover:text-emerald-400 transition">Farmer Portal</a>
+        <a href="/docs" class="hover:text-emerald-400 transition">Swagger API</a>
+        <a href="/api/health" class="hover:text-emerald-400 transition">System Health</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

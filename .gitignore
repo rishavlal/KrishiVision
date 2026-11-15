@@ -8,3 +8,10 @@ __pycache__/
 
 backend/app_before_validation_edit.py
 ml/plant_disease/dataset.zip
+# Local database files
+*.db
+*.db-shm
+*.db-wal
+
+# Large raw datasets
+backend/app/ml/plant_disease/dataset.zip
