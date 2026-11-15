@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional
 from PIL import Image
+import numpy as np
 
 from .disease_catalog import DISEASE_CATALOG, get_disease_detail, get_all_classes
 
@@ -82,6 +83,53 @@ def validate_and_preprocess_image(file_bytes: bytes, filename: str = "") -> Imag
     return image
 
 
+def _assess_plant_image(image: Image.Image) -> Optional[str]:
+    """Reject clear non-foliage images and withhold uncertain images from the disease model."""
+    sample = image.resize((96, 96), Image.Resampling.BILINEAR)
+    rgb = np.asarray(sample, dtype=np.uint8)
+    red, green, blue = (rgb[:, :, channel].astype(np.float32) for channel in range(3))
+
+    vegetation_ratio = float(
+        ((green > red * 1.08) & (green > blue * 0.95) & (green > 40)).mean()
+    )
+    ycbcr = np.asarray(sample.convert("YCbCr"), dtype=np.uint8)
+    luminance, chroma_blue, chroma_red = (
+        ycbcr[:, :, channel] for channel in range(3)
+    )
+    skin_ratio = float(
+        (
+            (chroma_blue >= 77)
+            & (chroma_blue <= 127)
+            & (chroma_red >= 133)
+            & (chroma_red <= 173)
+            & (luminance > 60)
+        ).mean()
+    )
+    hsv = np.asarray(sample.convert("HSV"), dtype=np.uint8)
+    mean_saturation = float(hsv[:, :, 1].mean() / 255)
+    bright_background_ratio = float(
+        ((red > 220) & (green > 220) & (blue > 220)).mean()
+    )
+    brightness_std = float(np.std(rgb.mean(axis=2)))
+
+    invalid_message = "Invalid Image — Please upload a clear crop leaf photograph."
+    if skin_ratio >= 0.22:
+        raise ValueError(invalid_message)
+    if (
+        bright_background_ratio >= 0.55
+        and mean_saturation < 0.12
+        and vegetation_ratio < 0.05
+    ):
+        raise ValueError(invalid_message)
+
+    if vegetation_ratio < 0.025 or brightness_std < 8:
+        return (
+            "Uncertain Image — Please upload a clear crop leaf photograph "
+            "with visible foliage."
+        )
+    return None
+
+
 def predict_leaf_disease(file_bytes: bytes, filename: str = "") -> Dict[str, Any]:
     """
     Main disease detection inference pipeline.
@@ -90,6 +138,22 @@ def predict_leaf_disease(file_bytes: bytes, filename: str = "") -> Dict[str, Any
     # Step 1: Preprocess image
     image = validate_and_preprocess_image(file_bytes, filename)
     img_width, img_height = image.size
+    image_uncertainty = _assess_plant_image(image)
+    if image_uncertainty:
+        return {
+            "model_status": "uncertain_image",
+            "model_loaded": False,
+            "filename": filename,
+            "message": image_uncertainty,
+            "prediction": None,
+            "confidence": None,
+            "disease_info": None,
+            "image_details": {
+                "dimensions": f"{img_width}x{img_height}",
+                "status": "Insufficient visual evidence of crop foliage"
+            },
+            "supported_classes": get_all_classes()
+        }
 
     # Step 2: Check for trained weights file
     model_path = find_model_file()
@@ -117,7 +181,6 @@ def predict_leaf_disease(file_bytes: bytes, filename: str = "") -> Dict[str, Any
             raw_preds = predictions[0]
             if hasattr(raw_preds, "numpy"):
                 raw_preds = raw_preds.numpy()
-            import numpy as np
             if np.isclose(np.sum(raw_preds), 1.0, atol=0.05):
                 score = raw_preds
             else:
@@ -132,9 +195,30 @@ def predict_leaf_disease(file_bytes: bytes, filename: str = "") -> Dict[str, Any
             else:
                 all_classes = sorted(list(DISEASE_CATALOG.keys()))
 
-            pred_idx = int(np.argmax(score))
+            sorted_indices = np.argsort(score)[::-1]
+            pred_idx = int(sorted_indices[0])
+            confidence_score = float(score[pred_idx])
+            second_score = float(score[sorted_indices[1]]) if len(sorted_indices) > 1 else 0.0
+            confidence = round(confidence_score * 100, 2)
+            if confidence_score < 0.45 or confidence_score - second_score < 0.10:
+                return {
+                    "model_status": "uncertain_prediction",
+                    "model_loaded": True,
+                    "filename": filename,
+                    "message": (
+                        "The image could not be matched to a disease with enough "
+                        "certainty. Please upload a clear crop leaf photograph."
+                    ),
+                    "prediction": None,
+                    "confidence": None,
+                    "disease_info": None,
+                    "image_details": {
+                        "dimensions": f"{img_width}x{img_height}",
+                        "status": "Model output was not sufficiently distinct"
+                    },
+                    "supported_classes": get_all_classes()
+                }
             predicted_class = all_classes[pred_idx] if pred_idx < len(all_classes) else "Unknown"
-            confidence = round(float(np.max(score)) * 100, 2)
             disease_info = get_disease_detail(predicted_class)
 
             return {

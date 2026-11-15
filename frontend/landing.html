@@ -55,6 +55,8 @@
   .badge-glow {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
   }
+
+  #features { scroll-margin-top: 6rem; }
 </style>
 </head>
 
@@ -82,7 +84,6 @@
         <a href="#pathways" class="hover:text-emerald-400 transition">Dual Pathways</a>
         <a href="#disease" class="hover:text-emerald-400 transition">Disease Vision</a>
         <a href="#how-it-works" class="hover:text-emerald-400 transition">How It Works</a>
-        <a href="#encyclopedia" class="hover:text-emerald-400 transition">Treatments</a>
       </nav>
 
       <!-- Action Buttons -->
@@ -159,7 +160,7 @@
   <section id="pathways" class="py-20 bg-slate-50 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <div id="features" class="text-center max-w-3xl mx-auto mb-16 scroll-mt-24">
         <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
           Agricultural Decision Science
         </span>
@@ -419,9 +420,6 @@
         <a href="/app" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-bold text-white shadow-xl shadow-emerald-500/30 hover:brightness-110 transition" style="background: linear-gradient(90deg, var(--mint), var(--mint-dark));">
           Launch कृषिVision Portal &rarr;
         </a>
-        <a href="/docs" target="_blank" class="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-emerald-200 bg-white/10 hover:bg-white/15 border border-white/20 transition">
-          Interactive API Docs (Swagger)
-        </a>
       </div>
 
     </div>
@@ -433,7 +431,6 @@
       <div class="flex items-center gap-2">
         <img src="/assets/favicon.svg" alt="कृषिVision" class="w-4 h-4" />
         <span class="text-white font-bold"><span class="hindi">कृषि</span><span style="color:var(--mint);">Vision</span></span>
-        <span>· B.Tech CSE 7th Sem Minor Project</span>
       </div>
       <div class="flex items-center gap-6">
         <a href="/app" class="hover:text-emerald-400 transition">Farmer Portal</a>

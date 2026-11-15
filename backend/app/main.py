@@ -172,7 +172,7 @@ def system_root(request: Request):
 def health_check(db: Session = Depends(get_db)):
     """
     Accurately report system health, active database connectivity,
-    model files, and cached inference readiness without loading models.
+    model availability, and cached inference readiness without loading models.
     """
     # 1. Verify actual database connectivity
     db_ok = False
@@ -207,7 +207,10 @@ def health_check(db: Session = Depends(get_db)):
     disease_model_ready = disease_model_loaded
 
     inference_ready = db_ok and crop_model_ready and disease_model_ready
-    system_status = "ok" if inference_ready else "degraded"
+    crop_model_available = crop_model_loaded or crop_model_file_available
+    disease_model_available = disease_model_loaded or disease_model_file_available
+    service_available = db_ok and crop_model_available and disease_model_available
+    system_status = "ok" if service_available else "degraded"
 
     return {
         "status": system_status,

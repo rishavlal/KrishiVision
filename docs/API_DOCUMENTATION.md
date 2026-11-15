@@ -218,6 +218,12 @@ Uploads a foliar image for validation, preprocessing, and neural diagnosis.
   filename extension alone is not accepted as proof of format. The legacy
   `confidence` response field is a model output score, not an empirically
   calibrated probability.
+- Obvious portraits and scanned documents are rejected. Images without enough
+  foliage cues or with an ambiguous model result return `200 OK` with
+  `model_status` set to `uncertain_image` or `uncertain_prediction`,
+  `prediction: null`, and `persisted: false`; no disease record is created.
+  These lightweight visual checks are not a dedicated plant-vs-non-plant
+  classifier and cannot identify every unrelated image.
 - **Response `200 OK`:**
 ```json
 {
@@ -225,9 +231,8 @@ Uploads a foliar image for validation, preprocessing, and neural diagnosis.
   "model_loaded": true,
   "filename": "tomato_leaf.jpg",
   "image_details": {
-    "format": "RGB",
     "dimensions": "224x224",
-    "status": "Validated and preprocessed successfully (224x224 RGB tensor ready)"
+    "status": "Inference completed via MobileNetV2 architecture"
   },
   "message": "Diagnosis completed with a model score.",
   "prediction": "Early Blight",
@@ -237,6 +242,8 @@ Uploads a foliar image for validation, preprocessing, and neural diagnosis.
   "persistence_error": null
 }
 ```
+- Clear invalid images return `400 Bad Request` with a request to upload a clear
+  crop leaf photograph.
 
 ### `GET /api/disease/classes`
 Returns all 27 supported plant disease classes across 6 species.
@@ -250,7 +257,9 @@ Returns symptoms and 3-tier treatments (organic, chemical, cultural) for a speci
 
 ### `GET /api/history`
 Returns the authenticated user's unified history of crop recommendations and disease inspections.
-Requires a valid bearer token; guests cannot retrieve prediction history.
+Authenticated users receive their own records; unauthenticated requests receive
+guest/community records. The `date` field is formatted in Asia/Kolkata, while
+`timestamp` remains an unambiguous UTC ISO-8601 value.
 
 ### `DELETE /api/history/{id}`
 Deletes a prediction record owned by the authenticated user. Requires a valid

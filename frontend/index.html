@@ -168,7 +168,7 @@
   </div>
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="w-full md:w-64 fixed md:inset-y-0 left-0 flex flex-col z-40 shadow-xl" style="background: var(--deep);">
+  <aside class="hidden md:flex md:w-64 fixed md:inset-y-0 left-0 flex-col z-40 shadow-xl" style="background: var(--deep);">
 
     <!-- Official कृषिVision Brand Header: Green Leaf Symbol ABOVE Project Name -->
     <div class="px-6 py-6 flex flex-col items-center justify-center border-b border-white/10 text-center">
@@ -230,7 +230,7 @@
   </aside>
 
   <!-- ================= MAIN CONTENT ================= -->
-  <main class="md:ml-64 flex-1 p-5 md:p-8 max-w-[1440px]">
+  <main class="md:ml-64 w-full min-w-0 flex-1 p-5 md:p-8 max-w-[1440px]">
 
     <!-- Notification Toast Banner -->
     <div id="status-banner" class="hidden mb-6 rounded-xl p-4 flex items-center justify-between text-sm transition shadow-lg">
@@ -503,12 +503,12 @@
 
       <!-- ---------------- PATH B FORM ---------------- -->
       <div id="container-path-b" class="hidden glass rounded-2xl p-6 md:p-8 shadow-xl mb-8 border border-slate-100">
-        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 mb-6 border-b border-slate-100">
           <div>
-            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Path B — Preliminary Guidance Engine</span>
-            <h3 class="text-lg font-bold text-slate-900 mt-1">Provide Regional & Agro-Climatic Observations</h3>
+            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Path B — Rule-Based Guidance</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1">Additional Agronomic Guidance</h3>
           </div>
-          <span class="text-xs text-amber-700 font-medium">Non-ML Rule System</span>
+          <span class="text-xs text-amber-700 font-medium">Not an ML prediction</span>
         </div>
 
         <form id="form-path-b" onsubmit="event.preventDefault(); submitPathBGuidance();">
@@ -644,10 +644,10 @@
 
         <!-- Selected File Preview & Inspection Action -->
         <div id="disease-selected-box" class="hidden mt-6 p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
+          <div class="flex w-full min-w-0 items-center gap-4 sm:w-auto sm:flex-1">
             <img id="leaf-preview-img" class="w-24 h-24 object-cover rounded-xl shadow-md border border-white" />
-            <div>
-              <p class="font-bold text-slate-900 text-sm" id="leaf-preview-name">leaf_sample.jpg</p>
+            <div class="min-w-0">
+              <p class="font-bold text-slate-900 text-sm break-all" id="leaf-preview-name">leaf_sample.jpg</p>
               <p class="text-xs text-slate-500 mt-0.5" id="leaf-preview-size">Ready for 224x224 RGB tensor preprocessing</p>
             </div>
           </div>
@@ -659,7 +659,7 @@
       </div>
 
       <!-- Disease Diagnostic Result -->
-      <div id="disease-result-container" class="hidden mb-8"></div>
+      <div id="disease-result-container" class="hidden mb-8 w-full min-w-0"></div>
 
       <!-- Comprehensive 27-Class Agricultural Encyclopedia -->
       <div class="glass rounded-2xl p-7 shadow-xl border border-slate-100">
@@ -846,12 +846,11 @@
 
         <!-- Live Profile Edit Form -->
         <div class="lg:col-span-2 glass rounded-2xl p-7 shadow-xl border border-slate-100">
-          <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+          <div class="flex items-center pb-4 mb-5 border-b border-slate-100">
             <div>
               <h3 class="font-bold text-slate-900 text-base">Edit Farm Information</h3>
               <p class="text-xs text-slate-500 mt-0.5">Update your details in the SQLite database.</p>
             </div>
-            <span class="text-xs text-slate-400">Live Database Update</span>
           </div>
 
           <form id="form-edit-profile" onsubmit="event.preventDefault(); saveProfileChanges();">
@@ -1026,6 +1025,25 @@
     let allDiseaseClasses = [];
     let allHistoryRecords = [];
     let currentHistoryFilter = 'all';
+
+    function formatIndianTimestamp(value) {
+      if (!value) return 'Date unavailable';
+
+      const timestamp = String(value).trim();
+      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(timestamp);
+      const parsed = new Date(hasTimezone ? timestamp : `${timestamp}Z`);
+      if (Number.isNaN(parsed.getTime())) return 'Date unavailable';
+
+      return new Intl.DateTimeFormat('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata'
+      }).format(parsed).replace(/\b(am|pm)\b/gi, value => value.toUpperCase());
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -1562,7 +1580,9 @@
 
         const data = await res.json();
         renderDiseaseResult(data);
-        if (data.persisted) {
+        if (data.model_status === 'uncertain_image' || data.model_status === 'uncertain_prediction') {
+          notify(data.message, 'warning');
+        } else if (data.persisted) {
           notify('Foliar image evaluated and saved to your history!', 'success');
         } else {
           notify(`Foliar diagnosis complete. (Note: Record not saved to database${data.persistence_error ? ': ' + data.persistence_error : ''})`, 'warning');
@@ -1579,9 +1599,15 @@
     function renderDiseaseResult(data) {
       const container = document.getElementById('disease-result-container');
       const isWeightMissing = data.model_status === 'model_weights_not_found';
+      const isUncertain = data.model_status === 'uncertain_image' || data.model_status === 'uncertain_prediction';
       const d = data.disease_info;
 
-      let diagnosisHtml = '';
+      let diagnosisHtml = isUncertain ? `
+        <div class="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200">
+          <h3 class="text-lg font-bold text-amber-900">Unable to confirm a crop leaf</h3>
+          <p class="text-sm text-amber-800 mt-1">${data.message || 'Please upload a clear crop leaf photograph.'}</p>
+        </div>
+      ` : '';
       if (d) {
         const isHealthy = d.is_healthy;
         diagnosisHtml = `
@@ -1627,20 +1653,20 @@
               <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-1.5">
                 <i data-lucide="shield-plus" class="w-4 h-4 text-emerald-600"></i> Recommended 3-Tier Action Regimen
               </h4>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200/70 shadow-sm">
+              <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                <div class="min-w-0 p-4 rounded-xl bg-emerald-50/80 border border-emerald-200/70 shadow-sm">
                   <h5 class="font-bold text-emerald-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
                     <i data-lucide="leaf" class="w-3.5 h-3.5 text-emerald-600"></i> 1. Organic / Bio Control
                   </h5>
                   <p class="text-xs text-emerald-900 leading-relaxed">${d.treatments.organic}</p>
                 </div>
-                <div class="p-4 rounded-xl bg-blue-50/80 border border-blue-200/70 shadow-sm">
+                <div class="min-w-0 p-4 rounded-xl bg-blue-50/80 border border-blue-200/70 shadow-sm">
                   <h5 class="font-bold text-blue-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
                     <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-600"></i> 2. Chemical Treatment
                   </h5>
                   <p class="text-xs text-blue-900 leading-relaxed">${d.treatments.chemical}</p>
                 </div>
-                <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200/70 shadow-sm">
+                <div class="min-w-0 p-4 rounded-xl bg-amber-50/80 border border-amber-200/70 shadow-sm">
                   <h5 class="font-bold text-amber-950 text-xs uppercase mb-1.5 flex items-center gap-1.5">
                     <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-600"></i> 3. Cultural & Preventive
                   </h5>
@@ -1653,32 +1679,32 @@
       }
 
       container.innerHTML = `
-        <div class="glass rounded-2xl p-7 shadow-2xl border ${isWeightMissing ? 'border-amber-200' : 'border-emerald-300'}">
+        <div class="glass w-full min-w-0 max-w-full rounded-2xl p-5 sm:p-7 shadow-2xl border ${isWeightMissing || isUncertain ? 'border-amber-200' : 'border-emerald-300'}">
           <div class="flex items-start justify-between mb-4 pb-4 border-b border-slate-100">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider ${isWeightMissing ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'} px-2.5 py-1 rounded-md">
-                ${isWeightMissing ? 'Model Status: Neural Weights Not Loaded' : 'Deep Learning Vision Diagnosis (MobileNetV2)'}
+            <div class="min-w-0 flex-1 pr-3">
+              <span class="text-xs font-bold uppercase tracking-wider ${isWeightMissing || isUncertain ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'} px-2.5 py-1 rounded-md">
+                ${isUncertain ? 'Image Needs Review' : isWeightMissing ? 'Disease model unavailable' : 'Plant leaf analysis'}
               </span>
-              <h3 id="disease-result-filename" class="text-xl font-extrabold text-slate-900 mt-2"></h3>
-              <p class="text-xs text-slate-500 mt-0.5">Dimensions: <span id="disease-result-dimensions">${data.image_details?.dimensions || '224x224'}</span> RGB · MobileNetV2 Tensor Normalization Verified</p>
+              <h3 id="disease-result-filename" class="text-xl font-extrabold text-slate-900 mt-2 break-all"></h3>
+              <p class="text-xs text-slate-500 mt-0.5">Model input: <span id="disease-result-dimensions">${data.image_details?.dimensions || '224x224'}</span> RGB · normalized for MobileNetV2</p>
             </div>
-            <div class="text-right">
-              <span id="disease-result-timestamp" class="text-xs text-slate-400 block">${data.timestamp || ''}</span>
+            <div class="text-right shrink-0">
+              <span id="disease-result-timestamp" class="text-xs text-slate-400 block">${formatIndianTimestamp(data.timestamp)}</span>
             </div>
           </div>
 
           ${diagnosisHtml}
 
-          <div class="p-4 rounded-xl ${isWeightMissing ? 'bg-amber-50 text-amber-900' : 'bg-emerald-50/60 text-emerald-950'} text-xs leading-relaxed mb-5 border border-emerald-100">
-            <strong>System Status:</strong> <span id="disease-result-message">${data.message || ''}</span>
+          <div class="p-4 rounded-xl ${isWeightMissing || isUncertain ? 'bg-amber-50 text-amber-900 border-amber-200' : 'bg-emerald-50/60 text-emerald-950 border-emerald-100'} text-xs leading-relaxed mb-5 border">
+            <strong>${isUncertain ? 'Next step:' : isWeightMissing ? 'Service notice:' : 'Result:'}</strong> <span id="disease-result-message">${data.message || ''}</span>
           </div>
 
-          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-            <div>
+          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="min-w-0">
               <h4 class="font-bold text-slate-900 text-sm">Diagnostic Encyclopedia Reference</h4>
               <p class="text-xs text-slate-600">Browse the 27-class treatment encyclopedia below for symptoms and remedies across Tomato, Potato, Corn, Apple, Grape, and Pepper.</p>
             </div>
-            <button onclick="document.getElementById('encyclopedia-grid').scrollIntoView({behavior:'smooth'})" class="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">
+            <button onclick="document.getElementById('encyclopedia-grid').scrollIntoView({behavior:'smooth'})" class="self-start sm:self-auto text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition whitespace-nowrap">
               Explore Encyclopedia &darr;
             </button>
           </div>
@@ -1827,14 +1853,14 @@
 
       tbody.innerHTML = records.map((r, recordIndex) => `
         <tr class="hover:bg-slate-50/80 transition">
-          <td class="px-6 py-4 text-xs text-slate-500 whitespace-nowrap">${r.date}</td>
+          <td class="px-6 py-4 text-xs text-slate-500 whitespace-nowrap">${formatIndianTimestamp(r.timestamp || r.created_at)}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${r.type === 'crop' ? (r.path === 'guided_no_soil' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') : 'bg-blue-100 text-blue-800'}">
               ${r.type === 'crop' ? (r.path === 'guided_no_soil' ? 'Guidance' : 'ML Crop') : 'Disease Scan'}
             </span>
           </td>
           <td class="px-6 py-4 text-xs font-medium text-slate-700">
-            ${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk}` : `Location: <span data-history-location="${recordIndex}"></span>`) : `<span data-history-plant="${recordIndex}"></span>: <span data-history-filename="${recordIndex}"></span>`}
+            ${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk}` : `Location: <span data-history-location="${recordIndex}"></span>`) : `<span data-history-plant="${recordIndex}"></span>: <span class="break-all" data-history-filename="${recordIndex}"></span>`}
           </td>
           <td class="px-6 py-4 text-xs font-bold text-slate-900">${r.crop || r.disease}</td>
           <td class="px-6 py-4 text-xs">
@@ -2097,12 +2123,12 @@
                       </div>
                       <div>
                         <p class="font-bold text-slate-900">${r.crop || r.disease}</p>
-                        <p class="text-slate-400 text-[10px]">${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk} · ${r.rainfall}` : `<span data-dashboard-location="${recordIndex}"></span>`) : `<span data-dashboard-filename="${recordIndex}"></span>`}</p>
+                        <p class="text-slate-400 text-[10px] break-all">${r.type === 'crop' ? (r.npk !== 'N/A' ? `NPK: ${r.npk} · ${r.rainfall}` : `<span data-dashboard-location="${recordIndex}"></span>`) : `<span data-dashboard-filename="${recordIndex}"></span>`}</p>
                       </div>
                     </div>
                     <div class="text-right">
                       <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px]">${r.confidence ? `${r.confidence}%` : 'Guidance'}</span>
-                      <p class="text-slate-400 text-[10px] mt-0.5">${r.date}</p>
+                      <p class="text-slate-400 text-[10px] mt-0.5">${formatIndianTimestamp(r.timestamp || r.created_at)}</p>
                     </div>
                   </div>
                 `).join('')}
@@ -2438,15 +2464,25 @@
         const res = await fetch(`${API_BASE}/api/health`);
         if (res.ok) {
           const data = await res.json();
-          if (data.status === 'ok') {
-            document.getElementById('dash-system-status').textContent = 'Backend & ML Online';
-            document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+          const statusLabel = document.getElementById('dash-system-status');
+          const statusDot = document.getElementById('backend-status-dot');
+          const services = data.services || {};
+          const databaseConnected = services.database === 'connected';
+          const modelsAvailable = services.crop_recommendation_model_file_available
+            && services.plant_disease_model_file_available;
+
+          if (data.ready === true && data.status === 'ok') {
+            statusLabel.textContent = 'All farm tools ready';
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+          } else if (data.status !== 'ok' || !databaseConnected || !modelsAvailable) {
+            statusLabel.textContent = 'Some tools are unavailable';
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
           } else {
-            document.getElementById('dash-system-status').textContent = 'System Degraded';
-            document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+            statusLabel.textContent = 'Tools available on demand';
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
           }
         } else {
-          document.getElementById('dash-system-status').textContent = 'System Degraded';
+          document.getElementById('dash-system-status').textContent = 'Service check unavailable';
           document.getElementById('backend-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
         }
       } catch (e) {

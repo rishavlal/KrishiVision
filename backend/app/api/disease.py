@@ -131,6 +131,20 @@ async def detect_leaf_disease(
             detail=f"Plant disease detection failed: {exc}"
         )
 
+    if result.get("model_status") in {"uncertain_image", "uncertain_prediction"}:
+        return DiseasePredictionResponse(
+            model_status=result["model_status"],
+            model_loaded=result.get("model_loaded", False),
+            filename=filename,
+            image_details=result.get("image_details"),
+            message=result["message"],
+            prediction=None,
+            confidence=None,
+            disease_info=None,
+            supported_classes=result.get("supported_classes"),
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+
     # E-02: Only persist successful predictions to database; track persistence status explicitly
     saved_id = None
     persisted = False

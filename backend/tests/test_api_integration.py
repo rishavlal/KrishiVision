@@ -6,8 +6,10 @@ Verifies all 10 system fixes: E-01 through E-10.
 
 import io
 import uuid
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 import pytest
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 def test_system_root(client):
@@ -16,6 +18,42 @@ def test_system_root(client):
     data = response.json()
     assert data["status"] == "online"
     assert "endpoints" in data
+
+
+def test_utc_timestamps_format_for_indian_users():
+    from app.core.time import format_india_datetime, utc_isoformat
+
+    timestamp = datetime(2026, 11, 15, 12, 58, 25, tzinfo=timezone.utc)
+    assert format_india_datetime(timestamp) == "15 Nov 2026, 06:28 PM"
+    assert utc_isoformat(timestamp) == "2026-11-15T12:58:25Z"
+    assert utc_isoformat(timestamp.replace(tzinfo=None)) == "2026-11-15T12:58:25Z"
+    local_timestamp = datetime(
+        2026, 11, 15, 18, 28, 25, tzinfo=timezone(timedelta(hours=5, minutes=30))
+    )
+    assert format_india_datetime(local_timestamp) == "15 Nov 2026, 06:28 PM"
+    assert utc_isoformat(local_timestamp) == "2026-11-15T12:58:25Z"
+    assert format_india_datetime(None) == "Date unavailable"
+    assert utc_isoformat(None) == ""
+
+
+def test_landing_cleanup_preserves_swagger_docs(client):
+    landing = client.get("/", headers={"accept": "text/html"})
+    assert landing.status_code == 200
+    assert 'href="#features"' in landing.text
+    assert 'id="features"' in landing.text
+    assert "Interactive API Docs (Swagger)" not in landing.text
+    assert "B.Tech CSE 7th Sem Minor Project" not in landing.text
+    assert 'href="#encyclopedia"' not in landing.text
+
+    dashboard = client.get("/app")
+    assert dashboard.status_code == 200
+    assert "Additional Agronomic Guidance" in dashboard.text
+    assert "Not an ML prediction" in dashboard.text
+    assert "Live Database Update" not in dashboard.text
+
+    docs = client.get("/docs")
+    assert docs.status_code == 200
+    assert "swagger-ui" in docs.text
 
 
 def test_health_check_endpoint(client, monkeypatch):
@@ -30,14 +68,35 @@ def test_health_check_endpoint(client, monkeypatch):
     data = response.json()
     assert data["status"] in ["ok", "degraded"]
     assert data["services"]["database"] == "connected"
+    assert data["status"] == "ok"
     assert data["services"]["crop_recommendation_ml_model"] in ["loaded", "file_available", "missing"]
     assert "plant_disease_model" in data["services"]
+    assert data["services"]["crop_recommendation_model_file_available"] is True
+    assert data["services"]["plant_disease_model_file_available"] is True
     assert data["services"]["crop_recommendation_model_loaded"] is False
     assert data["services"]["plant_disease_model_loaded"] is False
     assert data["ready"] is False
     assert data["readiness"] == "not_ready"
     assert data["services"]["crop_recommendation_model_ready"] is False
     assert data["services"]["plant_disease_model_ready"] is False
+
+
+def test_health_reports_missing_model_files_as_degraded(client, monkeypatch, tmp_path):
+    from app.ml.plant_disease import classifier as disease_classifier
+
+    monkeypatch.setattr("app.main.CROP_MODEL_PATH", tmp_path / "missing-crop-model.pkl")
+    monkeypatch.setattr(disease_classifier, "_LOADED_MODEL", None)
+    monkeypatch.setattr(disease_classifier, "find_model_file", lambda: None)
+
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["services"]["database"] == "connected"
+    assert data["status"] == "degraded"
+    assert data["ready"] is False
+    assert data["services"]["crop_recommendation_model_file_available"] is False
+    assert data["services"]["plant_disease_model_file_available"] is False
 
 
 def test_health_reports_loaded_models_as_ready(client, monkeypatch):
@@ -276,9 +335,8 @@ def test_disease_class_detail_endpoint(client):
 
 def test_disease_prediction_upload(client):
     """E-02 & E-07: Valid image upload and prediction persistence verification."""
-    img = Image.new("RGB", (300, 300), color=(40, 160, 40))
-    buf = io.BytesIO()
-    img.save(buf, format="JPEG")
+    sample_path = Path(__file__).resolve().parents[2] / "frontend" / "assets" / "samples" / "tomato_leaf_sample.jpg"
+    buf = io.BytesIO(sample_path.read_bytes())
     buf.seek(0)
 
     files = {"file": ("leaf.jpg", buf, "image/jpeg")}
@@ -291,6 +349,41 @@ def test_disease_prediction_upload(client):
     assert data["image_details"]["dimensions"] == "224x224"
     assert data["persisted"] is True
     assert data["record_id"] is not None
+
+
+def test_disease_portrait_upload_is_rejected(client):
+    portrait = Image.new("RGB", (240, 240), color=(185, 198, 208))
+    draw = ImageDraw.Draw(portrait)
+    draw.ellipse((48, 25, 192, 190), fill=(214, 157, 122))
+    draw.arc((80, 60, 160, 140), start=180, end=360, fill=(55, 42, 38), width=12)
+    buf = io.BytesIO()
+    portrait.save(buf, format="JPEG")
+
+    response = client.post(
+        "/api/disease/predict",
+        files={"file": ("portrait.jpg", buf, "image/jpeg")}
+    )
+
+    assert response.status_code == 400
+    assert "Invalid Image" in response.json()["detail"]
+
+
+def test_disease_uncertain_image_does_not_create_prediction(client):
+    image = Image.new("RGB", (240, 240), color=(40, 160, 40))
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG")
+
+    response = client.post(
+        "/api/disease/predict",
+        files={"file": ("flat-green.jpg", buf, "image/jpeg")}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["model_status"] == "uncertain_image"
+    assert data["prediction"] is None
+    assert data["disease_info"] is None
+    assert data["persisted"] is False
 
 
 def test_disease_oversized_image_rejection(client):

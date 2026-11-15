@@ -14,6 +14,7 @@ from ..core.security import get_optional_current_user
 from ..db.database import get_db
 from ..db.models import User, CropPredictionRecord, DiseasePredictionRecord
 from ..schemas.analytics import AnalyticsSummaryResponse, SoilAverages, CropCount
+from ..core.time import format_india_datetime
 
 router = APIRouter(prefix="/api/analytics", tags=["Analytics"])
 
@@ -98,7 +99,7 @@ def get_analytics_summary(
             "id": r.id,
             "title": f"Recommended: {r.predicted_crop}",
             "confidence": f"{r.confidence}%" if r.confidence else "Guidance",
-            "date": r.created_at.strftime("%b %d, %H:%M")
+            "date": format_india_datetime(r.created_at)
         }
         for r in recent_crops
     ]

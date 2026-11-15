@@ -12,6 +12,7 @@ from sqlalchemy import desc
 from ..core.security import get_current_user, get_optional_current_user
 from ..db.database import get_db
 from ..db.models import User, CropPredictionRecord, DiseasePredictionRecord
+from ..core.time import format_india_datetime, utc_isoformat
 
 router = APIRouter(tags=["Prediction History"])
 
@@ -59,8 +60,8 @@ def get_unified_history(
             "npk": npk_str,
             "rainfall": rainfall_str,
             "location": c.location or "General",
-            "date": c.created_at.strftime("%b %d, %Y %I:%M %p"),
-            "timestamp": c.created_at.isoformat() + "Z"
+            "date": format_india_datetime(c.created_at),
+            "timestamp": utc_isoformat(c.created_at)
         })
 
     for d in diseases:
@@ -73,8 +74,8 @@ def get_unified_history(
             "confidence": d.confidence,
             "severity": d.severity,
             "filename": d.filename,
-            "date": d.created_at.strftime("%b %d, %Y %I:%M %p"),
-            "timestamp": d.created_at.isoformat() + "Z"
+            "date": format_india_datetime(d.created_at),
+            "timestamp": utc_isoformat(d.created_at)
         })
 
     # Sort combined by timestamp descending
