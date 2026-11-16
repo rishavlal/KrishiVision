@@ -30,6 +30,41 @@
   * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
   .hindi { font-family: 'Tiro Devanagari Hindi', 'Noto Sans Devanagari', 'Mangal', serif; }
   body { background: #f8fafc; color: #0f172a; }
+  html[lang="hi"] body { font-family: 'Inter', 'Noto Sans Devanagari', 'Mangal', sans-serif; }
+
+  html[data-theme="dark"] { color-scheme: dark; }
+  html[data-theme="dark"] body { background: #0b1511; color: #e2e8f0; }
+  html[data-theme="dark"] .glass { background: rgba(20, 38, 31, 0.96); border-color: #263b32; }
+  html[data-theme="dark"] .bg-white,
+  html[data-theme="dark"] [class*="bg-white/"],
+  html[data-theme="dark"] [class*="bg-slate-50"] { background-color: #14261f !important; }
+  html[data-theme="dark"] [class*="bg-slate-100"] { background-color: #1b3028 !important; }
+  html[data-theme="dark"] [class*="border-slate-100"],
+  html[data-theme="dark"] [class*="border-slate-200"] { border-color: #2b4037 !important; }
+  html[data-theme="dark"] [class*="text-slate-900"],
+  html[data-theme="dark"] [class*="text-slate-800"],
+  html[data-theme="dark"] [class*="text-slate-700"] { color: #e2e8f0 !important; }
+  html[data-theme="dark"] [class*="text-slate-600"],
+  html[data-theme="dark"] [class*="text-slate-500"] { color: #b6c4bd !important; }
+  html[data-theme="dark"] [class*="text-slate-400"] { color: #91a39a !important; }
+  html[data-theme="dark"] input:not([type="radio"]):not([type="checkbox"]),
+  html[data-theme="dark"] select,
+  html[data-theme="dark"] textarea { color: #e2e8f0; background-color: #14261f; border-color: #3a5146; }
+  html[data-theme="dark"] input::placeholder,
+  html[data-theme="dark"] textarea::placeholder { color: #91a39a; }
+  html[data-theme="dark"] [class*="bg-emerald-50"],
+  html[data-theme="dark"] [class*="bg-emerald-100"] { background-color: rgba(16, 185, 129, 0.14) !important; }
+  html[data-theme="dark"] [class*="bg-amber-50"],
+  html[data-theme="dark"] [class*="bg-amber-100"] { background-color: rgba(245, 158, 11, 0.14) !important; }
+  html[data-theme="dark"] [class*="bg-blue-50"],
+  html[data-theme="dark"] [class*="bg-blue-100"] { background-color: rgba(59, 130, 246, 0.14) !important; }
+  html[data-theme="dark"] [class*="bg-rose-50"],
+  html[data-theme="dark"] [class*="bg-rose-100"] { background-color: rgba(244, 63, 94, 0.14) !important; }
+  html[data-theme="dark"] [class*="border-emerald-100"],
+  html[data-theme="dark"] [class*="border-emerald-200"],
+  html[data-theme="dark"] [class*="border-amber-200"],
+  html[data-theme="dark"] [class*="border-blue-100"],
+  html[data-theme="dark"] [class*="border-rose-200"] { border-color: #385448 !important; }
 
   .glass {
     background: var(--paper-card);
@@ -164,6 +199,9 @@
       <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('profile'); toggleMobileNav();">
         <i data-lucide="user-check" class="w-5 h-5 text-emerald-400"></i> Farmer Profile
       </button>
+      <button class="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition" onclick="showTab('settings'); toggleMobileNav();">
+        <i data-lucide="settings" class="w-5 h-5 text-emerald-400"></i> Settings
+      </button>
     </div>
   </div>
 
@@ -207,6 +245,9 @@
       </button>
       <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="profile">
         <i data-lucide="user-check" class="w-4 h-4"></i> Farmer Profile
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" data-tab="settings">
+        <i data-lucide="settings" class="w-4 h-4"></i> Settings
       </button>
     </nav>
 
@@ -915,6 +956,108 @@
       </div>
     </section>
 
+    <!-- ================= TAB 7: SETTINGS ================= -->
+    <section id="tab-settings" class="tab-panel">
+      <div class="mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="settings" class="w-6 h-6 text-emerald-600"></i> Settings
+        </h2>
+        <p class="text-slate-500 text-sm mt-1">Customize appearance and language for your KrishiVision dashboard.</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <section class="glass rounded-2xl p-6 shadow-lg border border-slate-100" aria-labelledby="appearance-heading">
+          <div class="flex items-start gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="palette" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 id="appearance-heading" class="font-bold text-slate-900">Appearance</h3>
+              <p class="text-xs text-slate-500 mt-1">Choose how the dashboard looks on this device.</p>
+            </div>
+          </div>
+          <fieldset>
+            <legend class="sr-only">Theme preference</legend>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm cursor-pointer hover:border-emerald-400">
+                <input type="radio" name="theme-preference" value="light" class="accent-emerald-600" onchange="setThemePreference(this.value)">
+                <span>Light Mode</span>
+              </label>
+              <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm cursor-pointer hover:border-emerald-400">
+                <input type="radio" name="theme-preference" value="dark" class="accent-emerald-600" onchange="setThemePreference(this.value)">
+                <span>Dark Mode</span>
+              </label>
+              <label class="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm cursor-pointer hover:border-emerald-400">
+                <input type="radio" name="theme-preference" value="system" class="accent-emerald-600" onchange="setThemePreference(this.value)">
+                <span>System Default</span>
+              </label>
+            </div>
+          </fieldset>
+          <p class="text-xs text-slate-500 mt-3">System Default follows your device's light or dark appearance preference.</p>
+        </section>
+
+        <section class="glass rounded-2xl p-6 shadow-lg border border-slate-100" aria-labelledby="language-heading">
+          <div class="flex items-start gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="languages" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 id="language-heading" class="font-bold text-slate-900">Language</h3>
+              <p class="text-xs text-slate-500 mt-1">The dashboard interface updates immediately.</p>
+            </div>
+          </div>
+          <label for="language-preference" class="block text-xs font-semibold text-slate-600 mb-2">Display language</label>
+          <select id="language-preference" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm" onchange="setLanguagePreference(this.value)">
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+          </select>
+        </section>
+
+        <section class="glass rounded-2xl p-6 shadow-lg border border-slate-100" aria-labelledby="account-preferences-heading">
+          <div class="flex items-start gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="user-round" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 id="account-preferences-heading" class="font-bold text-slate-900">Account</h3>
+              <p class="text-xs text-slate-500 mt-1">Your current profile information.</p>
+            </div>
+          </div>
+          <div id="settings-account-details" class="space-y-3 text-sm">
+            <p class="text-slate-500">Sign in to view your account profile.</p>
+          </div>
+          <button type="button" onclick="showTab('profile')" class="mt-5 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Open Farmer Profile
+          </button>
+        </section>
+
+        <section class="glass rounded-2xl p-6 shadow-lg border border-slate-100" aria-labelledby="notifications-heading">
+          <div class="flex items-start gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 id="notifications-heading" class="font-bold text-slate-900">Notifications</h3>
+              <p class="text-xs text-slate-500 mt-1">About dashboard messages</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed">The dashboard currently shows temporary in-app status messages. Notification preferences are not available in this system.</p>
+        </section>
+      </div>
+
+      <div class="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <p class="text-xs text-slate-500">Theme and language preferences are saved on this device.</p>
+        <div class="flex flex-col-reverse sm:flex-row gap-3">
+          <button type="button" onclick="resetPreferences()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            Reset to Default
+          </button>
+          <button type="button" onclick="savePreferences()" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            Save Preferences
+          </button>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ================= AUTH MODAL (LOGIN / REGISTER) ================= -->
@@ -1025,6 +1168,524 @@
     let allDiseaseClasses = [];
     let allHistoryRecords = [];
     let currentHistoryFilter = 'all';
+    const preferenceKeys = {
+      theme: 'krishivision_theme',
+      language: 'krishivision_language'
+    };
+    const translations = {
+      'Account': 'खाता',
+      'Account Security & Password': 'खाता सुरक्षा और पासवर्ड',
+      'Action': 'कार्रवाई',
+      'Additional Agronomic Guidance': 'अतिरिक्त कृषि मार्गदर्शन',
+      'Advisory Note:': 'सलाह:',
+      'All Records': 'सभी रिकॉर्ड',
+      'All Species': 'सभी प्रजातियाँ',
+      'About dashboard messages': 'डैशबोर्ड संदेशों के बारे में',
+      'Appearance': 'दिखावट',
+      'Autofill Climate': 'जलवायु स्वतः भरें',
+      'Benchmark Comparison': 'मानक तुलना',
+      'Black Soil': 'काली मिट्टी',
+      'Browse From Device': 'डिवाइस से चुनें',
+      'Category': 'श्रेणी',
+      'Checking Auth': 'प्रमाणीकरण जाँच रहा है',
+      'Choose how the dashboard looks on this device.': 'इस डिवाइस पर डैशबोर्ड की दिखावट चुनें।',
+      'Clay Loam': 'चिकनी दोमट मिट्टी',
+      'Clay Soil': 'चिकनी मिट्टी',
+      'Confirm New Password *': 'नए पासवर्ड की पुष्टि करें *',
+      'Connecting to Backend...': 'बैकएंड से कनेक्ट हो रहा है...',
+      'Contact Phone Number': 'संपर्क फ़ोन नंबर',
+      'Create Account': 'खाता बनाएँ',
+      'Demo Login: 1-Click Fast Access': 'डेमो साइन इन: एक क्लिक में प्रवेश',
+      '🍅 Tomato Early Blight Sample': '🍅 Tomato Early Blight नमूना',
+      '🥔 Potato Late Blight Sample': '🥔 Potato Late Blight नमूना',
+      '🌽 Corn Healthy Foliage Sample': '🌽 Corn स्वस्थ पत्तियों का नमूना',
+      '🧹 Clear': '🧹 साफ़ करें',
+      'Crop Recommendation': 'फसल सुझाव',
+      'Crops': 'फसलें',
+      'Current Password *': 'वर्तमान पासवर्ड *',
+      'Customize appearance and language for your KrishiVision dashboard.': 'अपने कृषिVision डैशबोर्ड की दिखावट और भाषा अनुकूलित करें।',
+      'Dark Mode': 'डार्क मोड',
+      'Dashboard': 'डैशबोर्ड',
+      'Database': 'डेटाबेस',
+      'Database records of your past crop recommendations and disease scans.': 'आपके पिछले फसल सुझावों और रोग स्कैन के डेटाबेस रिकॉर्ड।',
+      'Date & Time': 'दिनांक और समय',
+      'Deep Learning Vision': 'डीप लर्निंग विज़न',
+      'Diagnose Foliage': 'पत्तियों का निदान करें',
+      'Disease Detection': 'रोग पहचान',
+      'Diseases': 'रोग',
+      'Display language': 'प्रदर्शन भाषा',
+      'Drag & drop your crop leaf photograph here': 'फसल की पत्ती की तस्वीर यहाँ खींचकर छोड़ें',
+      'Dual Pathway Decision': 'दो विकल्पों से निर्णय',
+      'Dynamic': 'गतिशील',
+      'Edit Farm Information': 'खेत की जानकारी संपादित करें',
+      'Email Address *': 'ईमेल पता *',
+      'Email': 'ईमेल',
+      'Email:': 'ईमेल:',
+      'Enter Soil Chemistry & Meteorological Parameters': 'मिट्टी की रासायनिक और मौसम संबंधी जानकारी दर्ज करें',
+      'Explore symptoms, organic remedies, and chemical fungicides across 27 conditions.': '27 स्थितियों के लक्षण, जैविक उपचार और रासायनिक फफूंदनाशक देखें।',
+      'Export CSV': 'CSV निर्यात करें',
+      'Farm': 'खेत',
+      'Farm / Village Location': 'खेत / गाँव का स्थान',
+      'Farm Location (Optional)': 'खेत का स्थान (वैकल्पिक)',
+      'Farm Location': 'खेत का स्थान',
+      'Farm Size (Ha)': 'खेत का आकार (हेक्टेयर)',
+      'Farmer Full Name': 'किसान का पूरा नाम',
+      'Farmer Profile': 'किसान प्रोफ़ाइल',
+      'Field Inputs / Species': 'खेत का डेटा / प्रजाति',
+      'Field Soil Nutrient Averages': 'खेत की मिट्टी के पोषक तत्वों का औसत',
+      'Foliar': 'पर्णीय',
+      'Foliar convolutional neural network inspection across 27 conditions.': '27 स्थितियों के लिए पत्तियों का कन्वोल्यूशनल न्यूरल नेटवर्क से विश्लेषण।',
+      'Full Name': 'पूरा नाम',
+      'Generate Agro-Climatic Guidance': 'कृषि-जलवायु मार्गदर्शन तैयार करें',
+      'Growing Season (Optional)': 'बुवाई का मौसम (वैकल्पिक)',
+      'Growing Season *': 'बुवाई का मौसम *',
+      'Guest Farmer': 'अतिथि किसान',
+      'Guest Mode': 'अतिथि मोड',
+      'Guided preliminary agro-climatic suggestions based on your Location, Season, and Water availability.': 'स्थान, मौसम और पानी की उपलब्धता के आधार पर शुरुआती कृषि-जलवायु सुझाव।',
+      'High (Abundant water / flooding)': 'अधिक (पर्याप्त पानी / बाढ़)',
+      'Home / Landing Page': 'होम / मुख्य पृष्ठ',
+      'Instant Benchmark Leaves:': 'तत्काल नमूना पत्तियाँ:',
+      'Integrated Farm Health Diagnostic': 'एकीकृत खेत स्वास्थ्य जाँच',
+      'Irrigation System Available? *': 'सिंचाई की सुविधा उपलब्ध है? *',
+      'Kharif (Monsoon: Jun – Oct)': 'खरीफ (मानसून: जून – अक्टूबर)',
+      'Known Soil Texture (Optional)': 'ज्ञात मिट्टी की बनावट (वैकल्पिक)',
+      'Landholding Size': 'भूमि का आकार',
+      'Landholding': 'भूमि',
+      'Language': 'भाषा',
+      'Light Mode': 'लाइट मोड',
+      'Live Database': 'लाइव डेटाबेस',
+      'Loading...': 'लोड हो रहा है...',
+      'Loamy Soil': 'दोमट मिट्टी',
+      'Location': 'स्थान',
+      'Low (Drought prone / limited)': 'कम (सूखे की आशंका / सीमित)',
+      'Manage your agricultural landholding, location, and farm credentials.': 'अपनी कृषि भूमि, स्थान और खेत की जानकारी प्रबंधित करें।',
+      'Member Since:': 'सदस्य बने:',
+      'Model score': 'मॉडल स्कोर',
+      'Moderate (Average rainfall / canal)': 'मध्यम (औसत वर्षा / नहर)',
+      'Multi-parameter soil chemistry, meteorological telemetry, and foliar vision intelligence.': 'मिट्टी के कई रासायनिक मानदंड, मौसम संबंधी डेटा और पत्ती विश्लेषण।',
+      'New Password *': 'नया पासवर्ड *',
+      'Nitrogen — N (kg/ha) *': 'नाइट्रोजन — N (किग्रा/हेक्टेयर) *',
+      'No (Purely Rainfed)': 'नहीं (केवल वर्षा पर निर्भर)',
+      'Not Signed In': 'साइन इन नहीं है',
+      'Not an ML prediction': 'यह ML भविष्यवाणी नहीं है',
+      'Notifications': 'सूचनाएँ',
+      'Open Farmer Profile': 'किसान प्रोफ़ाइल खोलें',
+      'Past Analyses:': 'पिछले विश्लेषण:',
+      'Path A (With Soil Report) or Path B (Guided / No Soil Report). Powered by trained Random Forest.': 'विकल्प A (मिट्टी की रिपोर्ट सहित) या विकल्प B (मार्गदर्शित / बिना रिपोर्ट)। प्रशिक्षित Random Forest द्वारा संचालित।',
+      'Path A — Machine Learning Engine': 'विकल्प A — मशीन लर्निंग इंजन',
+      'Path A — Soil Report Available': 'विकल्प A — मिट्टी की रिपोर्ट उपलब्ध',
+      'Path B — No Soil Report Yet': 'विकल्प B — अभी मिट्टी की रिपोर्ट नहीं',
+      'Path B — Rule-Based Guidance': 'विकल्प B — नियम-आधारित मार्गदर्शन',
+      'Phone:': 'फ़ोन:',
+      'Phone': 'फ़ोन',
+      'Phosphorus — P (kg/ha) *': 'फॉस्फोरस — P (किग्रा/हेक्टेयर) *',
+      'Plant Disease Detection': 'पौधों के रोगों की पहचान',
+      'Plant Disease Scans': 'पौधों के रोग स्कैन',
+      'Plant Disease Treatment Encyclopedia': 'पौधों के रोग उपचार विश्वकोश',
+      'Potassium — K (kg/ha) *': 'पोटैशियम — K (किग्रा/हेक्टेयर) *',
+      'Prediction History': 'भविष्यवाणी इतिहास',
+      'Previous Crop in Field (Optional)': 'खेत में पिछली फसल (वैकल्पिक)',
+      'Quick Presets:': 'त्वरित नमूने:',
+      'Rabi (Winter: Oct – Mar)': 'रबी (सर्दी: अक्टूबर – मार्च)',
+      'Ready for 224x224 RGB tensor preprocessing': '224x224 RGB टेन्सर प्री-प्रोसेसिंग के लिए तैयार',
+      'Real-time agricultural telemetry and prediction trends computed from your database.': 'आपके डेटाबेस से वास्तविक समय के कृषि आँकड़े और भविष्यवाणी रुझान।',
+      'Recent Farm Predictions & Activity': 'खेत की हाल की भविष्यवाणियाँ और गतिविधि',
+      'Recommendation': 'सुझाव',
+      'Recommended Crop Distribution': 'सुझाई गई फसलों का वितरण',
+      'Refresh': 'रीफ़्रेश करें',
+      'Refresh Data': 'डेटा रीफ़्रेश करें',
+      'Register New Farmer': 'नया किसान पंजीकृत करें',
+      'Relative Humidity (%) *': 'सापेक्ष आर्द्रता (%) *',
+      'Reset to Default': 'डिफ़ॉल्ट पर रीसेट करें',
+      'Run Random Forest Inference': 'Random Forest विश्लेषण चलाएँ',
+      'Sandy Loam': 'बलुई दोमट मिट्टी',
+      'Save Farm Profile Changes': 'खेत की प्रोफ़ाइल सहेजें',
+      'Seasonal Rainfall (mm) *': 'मौसमी वर्षा (मिमी) *',
+      'Select the pathway matching your field data availability.': 'अपने खेत के उपलब्ध डेटा के अनुसार विकल्प चुनें।',
+      'Settings': 'सेटिंग्स',
+      'Sign In': 'साइन इन करें',
+      'Sign Out': 'साइन आउट करें',
+      'Sign in to save predictions and personalized farm analytics.': 'भविष्यवाणियाँ सहेजने और व्यक्तिगत खेत विश्लेषण पाने के लिए साइन इन करें।',
+      'Sign in to view your account profile.': 'अपनी खाता प्रोफ़ाइल देखने के लिए साइन इन करें।',
+      'Smarter Decisions · Better Farming': 'बेहतर निर्णय · बेहतर खेती',
+      'Soil & Crop Analytics': 'मिट्टी और फसल विश्लेषण',
+      'Soil Health Index': 'मिट्टी स्वास्थ्य सूचकांक',
+      'Soil Texture (Optional)': 'मिट्टी की बनावट (वैकल्पिक)',
+      'Soil pH (0–14) *': 'मिट्टी का pH (0–14) *',
+      'State / Province *': 'राज्य / प्रांत *',
+      'Step 1: Do you have a laboratory soil test report?': 'चरण 1: क्या आपके पास प्रयोगशाला की मिट्टी जाँच रिपोर्ट है?',
+      'Supports high-resolution JPEG, PNG, or WEBP foliar close-ups (up to 10 MB)': 'उच्च-रिज़ॉल्यूशन JPEG, PNG या WEBP पत्ती की तस्वीरें (अधिकतम 10 MB) समर्थित हैं',
+      'Switch / Sign In': 'खाता बदलें / साइन इन करें',
+      'System Default': 'सिस्टम डिफ़ॉल्ट',
+      'System Default follows your device\'s light or dark appearance preference.': 'सिस्टम डिफ़ॉल्ट आपके डिवाइस की लाइट या डार्क सेटिंग का अनुसरण करता है।',
+      'Temperature (°C) *': 'तापमान (°C) *',
+      'The dashboard currently shows temporary in-app status messages. Notification preferences are not available in this system.': 'डैशबोर्ड अभी अस्थायी इन-ऐप स्थिति संदेश दिखाता है। इस सिस्टम में सूचना प्राथमिकताएँ उपलब्ध नहीं हैं।',
+      'The dashboard interface updates immediately.': 'डैशबोर्ड की भाषा तुरंत बदलती है।',
+      'Theme and language preferences are saved on this device.': 'थीम और भाषा की प्राथमिकताएँ इस डिवाइस पर सहेजी जाती हैं।',
+      'Theme preference': 'थीम प्राथमिकता',
+      'This path generates rule-based agronomic recommendations. It does not calculate ML model scores. For precise soil-grounded recommendations, obtain a Soil Health Card with N-P-K readings and use Path A.': 'यह विकल्प नियम-आधारित कृषि सुझाव देता है। इसमें ML मॉडल स्कोर की गणना नहीं होती। मिट्टी पर आधारित सटीक सुझाव के लिए N-P-K रीडिंग वाला Soil Health Card प्राप्त करें और विकल्प A चुनें।',
+      'Total Crop Predictions': 'कुल फसल भविष्यवाणियाँ',
+      'Total Landholding (Hectares)': 'कुल भूमि (हेक्टेयर)',
+      'Update Password': 'पासवर्ड अपडेट करें',
+      'Update your details in the SQLite database.': 'अपनी जानकारी SQLite डेटाबेस में अपडेट करें।',
+      'Update your password securely in the database.': 'अपना पासवर्ड डेटाबेस में सुरक्षित रूप से अपडेट करें।',
+      'Upload leaf photos to analyze foliar diseases across 27 conditions with organic, chemical, and cultural treatments.': '27 स्थितियों के पर्णीय रोगों का विश्लेषण और जैविक, रासायनिक तथा कृषि-पद्धति उपचार देखने के लिए पत्तियों की तस्वीरें अपलोड करें।',
+      'Username *': 'उपयोगकर्ता नाम *',
+      'Username': 'उपयोगकर्ता नाम',
+      'Username or Email': 'उपयोगकर्ता नाम या ईमेल',
+      'Username:': 'उपयोगकर्ता नाम:',
+      'View All History →': 'पूरा इतिहास देखें →',
+      'Water Availability *': 'पानी की उपलब्धता *',
+      'Welcome to': 'स्वागत है',
+      'Your current profile information.': 'आपकी वर्तमान प्रोफ़ाइल जानकारी।',
+      'Awaiting Test': 'जाँच की प्रतीक्षा',
+      'Active': 'सक्रिय',
+      'No Data': 'डेटा नहीं',
+      'Target: 60-100 kg/ha': 'लक्ष्य: 60-100 किग्रा/हेक्टेयर',
+      'Target: 30-60 kg/ha': 'लक्ष्य: 30-60 किग्रा/हेक्टेयर',
+      'Target: 30-70 kg/ha': 'लक्ष्य: 30-70 किग्रा/हेक्टेयर',
+      'Target: 6.5–7.5': 'लक्ष्य: 6.5–7.5',
+      'Welcome! No field soil tests have been submitted to your farm profile yet. Once you submit a soil report in Path A, कृषिVision will compute real-time soil acidity, nutrient replenishment targets, and crop diversity indexes here.': 'स्वागत है! अभी तक आपके खेत की प्रोफ़ाइल में मिट्टी जाँच रिपोर्ट जमा नहीं की गई है। विकल्प A में रिपोर्ट जमा करने के बाद कृषिVision यहाँ मिट्टी की अम्लता, पोषक तत्वों की आवश्यकता और फसल विविधता का ताज़ा विश्लेषण दिखाएगा।',
+      'Yes (Borewell / Tube-well / Drip)': 'हाँ (बोरवेल / ट्यूबवेल / ड्रिप)',
+      'Zaid (Summer: Mar – Jun)': 'ज़ायद (गर्मी: मार्च – जून)',
+      '— Crop Recommendation': '— फसल सुझाव',
+      '— Farmer Profile': '— किसान प्रोफ़ाइल',
+      '— Plant Disease Diagnostics': '— पौधों के रोगों का निदान',
+      '— Prediction History': '— भविष्यवाणी इतिहास',
+      '— Soil & Crop Analytics': '— मिट्टी और फसल विश्लेषण',
+      'कृषि': 'कृषि',
+      'Loading records from database...': 'डेटाबेस से रिकॉर्ड लोड हो रहे हैं...',
+      'No prediction records found': 'भविष्यवाणी के रिकॉर्ड नहीं मिले',
+      'Run a Crop Recommendation or Foliar Disease Scan to start recording history.': 'इतिहास दर्ज करने के लिए फसल सुझाव या पत्ती रोग स्कैन चलाएँ।',
+      'Get Recommendation': 'फसल सुझाव पाएँ',
+      'Failed to load history:': 'इतिहास लोड नहीं हो सका:',
+      'Guidance': 'मार्गदर्शन',
+      'ML Crop': 'ML फसल',
+      'Disease Scan': 'रोग स्कैन',
+      'Delete Record': 'रिकॉर्ड हटाएँ',
+      'Rule Match': 'नियम-आधारित मिलान',
+      'No history records available to export.': 'निर्यात के लिए इतिहास रिकॉर्ड उपलब्ध नहीं हैं।',
+      'Exported history as CSV file.': 'इतिहास CSV फ़ाइल के रूप में निर्यात किया गया।',
+      'No crop predictions in database yet.': 'डेटाबेस में अभी फसल भविष्यवाणियाँ नहीं हैं।',
+      'Run a crop recommendation to generate distribution analytics.': 'फसल वितरण विश्लेषण के लिए फसल सुझाव चलाएँ।',
+      'No soil reports submitted yet.': 'अभी मिट्टी की रिपोर्ट जमा नहीं की गई है।',
+      'Enter N-P-K parameters in Path A to view benchmark nutrient levels.': 'पोषक तत्वों का मानक स्तर देखने के लिए विकल्प A में N-P-K मान दर्ज करें।',
+      'Low Deficient': 'कमी',
+      'Optimal': 'उपयुक्त',
+      'High': 'अधिक',
+      'Acidic': 'अम्लीय',
+      'Optimal Neutral': 'उपयुक्त तटस्थ',
+      'Alkaline': 'क्षारीय',
+      'Good morning': 'सुप्रभात',
+      'Good afternoon': 'नमस्कार',
+      'Good evening': 'शुभ संध्या',
+      'Farmer': 'किसान',
+      'Hectares Landholding': 'हेक्टेयर भूमि',
+      'Click to sign in': 'साइन इन करने के लिए क्लिक करें',
+      'No predictions logged yet. Run your first Soil Recommendation or Plant Scan to view real-time farm activity.': 'अभी कोई भविष्यवाणी दर्ज नहीं है। खेत की गतिविधि देखने के लिए पहला मिट्टी सुझाव या पौधा स्कैन चलाएँ।',
+      'Name': 'नाम',
+      'Preferences saved on this device.': 'प्राथमिकताएँ इस डिवाइस पर सहेजी गईं।',
+      'Reset appearance and language to their defaults? Account data and prediction history will not be changed.': 'दिखावट और भाषा को डिफ़ॉल्ट पर रीसेट करें? खाता डेटा और भविष्यवाणी इतिहास नहीं बदलेगा।',
+      'Preferences reset to defaults.': 'प्राथमिकताएँ डिफ़ॉल्ट पर रीसेट की गईं।',
+      'Saving Changes...': 'परिवर्तन सहेजे जा रहे हैं...',
+      'Verifying...': 'सत्यापन हो रहा है...',
+      'Creating Account...': 'खाता बनाया जा रहा है...',
+      'Updating...': 'अपडेट हो रहा है...',
+      'Please sign in or create an account to save your profile changes.': 'अपनी प्रोफ़ाइल में बदलाव सहेजने के लिए साइन इन करें या खाता बनाएँ।',
+      'Please sign in to change password.': 'पासवर्ड बदलने के लिए साइन इन करें।',
+      'Please enter both current and new passwords.': 'वर्तमान और नया, दोनों पासवर्ड दर्ज करें।',
+      'New password must be at least 6 characters.': 'नया पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।',
+      'New password confirmation does not match.': 'नए पासवर्ड की पुष्टि मेल नहीं खाती।',
+      'Password updated. Previous sessions were revoked; please sign in again.': 'पासवर्ड अपडेट किया गया। पिछले सत्र रद्द कर दिए गए हैं; कृपया फिर से साइन इन करें।',
+      'Password': 'पासवर्ड',
+      'Password *': 'पासवर्ड *',
+      'Save Preferences': 'प्राथमिकताएँ सहेजें',
+      'Toggle Navigation': 'नेविगेशन खोलें या बंद करें',
+      'All farm tools ready': 'खेत के सभी उपकरण तैयार हैं',
+      'Some tools are unavailable': 'कुछ उपकरण उपलब्ध नहीं हैं',
+      'Tools available on demand': 'ज़रूरत पर उपकरण उपलब्ध होंगे',
+      'Service check unavailable': 'सेवा की जाँच उपलब्ध नहीं है',
+      'Backend Offline': 'बैकएंड ऑफ़लाइन है',
+      'Dual-Pathway Crop Recommendation': 'दो विकल्पों से फसल सुझाव',
+      'Laboratory Soil Report Available': 'प्रयोगशाला की मिट्टी रिपोर्ट उपलब्ध',
+      'No Laboratory Soil Report Yet': 'अभी प्रयोगशाला की मिट्टी रिपोर्ट नहीं है',
+      'Full ML Random Forest prediction with Nitrogen (N), Phosphorus (P), Potassium (K), and Soil pH values.': 'Nitrogen (N), Phosphorus (P), Potassium (K) और मिट्टी के pH मानों से ML Random Forest भविष्यवाणी।',
+      'Model input:': 'मॉडल इनपुट:',
+      'Neural model score': 'न्यूरल मॉडल स्कोर',
+      'Foliar Diagnostic Symptoms': 'पत्ती रोग के लक्षण',
+      'Recommended 3-Tier Action Regimen': 'अनुशंसित तीन-स्तरीय उपचार',
+      'Organic / Bio Control': 'जैविक नियंत्रण',
+      'Chemical Treatment': 'रासायनिक उपचार',
+      'Cultural & Preventive': 'कृषि-पद्धति और बचाव',
+      'Cultural / Prevention': 'कृषि-पद्धति / बचाव',
+      'Diagnostic Encyclopedia Reference': 'रोग विश्वकोश संदर्भ',
+      'Explore Encyclopedia &darr;': 'विश्वकोश देखें ↓',
+      'View Treatments & Symptoms': 'उपचार और लक्षण देखें',
+      'Pathogen:': 'रोगजनक:',
+      'Severity:': 'तीव्रता:',
+      'Diagnostic Symptoms': 'निदान के लक्षण',
+      'Optimal Recommended Crop': 'सबसे उपयुक्त सुझाई गई फसल',
+      'Path A (ML Verified)': 'विकल्प A (ML सत्यापित)',
+      'Top Alternative Crops Considered': 'अन्य संभावित फसलें',
+      'model probability score': 'मॉडल संभावना स्कोर',
+      'Soil pH:': 'मिट्टी का pH:',
+      'Temp:': 'तापमान:',
+      'Rainfall:': 'वर्षा:',
+      'score': 'स्कोर',
+      'Suitable Crops for': 'के लिए उपयुक्त फसलें',
+      'Season': 'मौसम',
+      'Switch to Path A': 'विकल्प A पर जाएँ',
+      'Agro-Match': 'कृषि-मिलान',
+      'Obtain a Soil Health Card with Nitrogen, Phosphorus, Potassium and pH for full Random Forest predictions.': 'पूरी Random Forest भविष्यवाणी के लिए Nitrogen, Phosphorus, Potassium और pH वाला Soil Health Card प्राप्त करें।',
+      'Enter Soil Card': 'मिट्टी कार्ड दर्ज करें',
+      'Unable to confirm a crop leaf': 'फसल की पत्ती की पुष्टि नहीं हो सकी',
+      'Please upload a clear crop leaf photograph.': 'कृपया फसल की पत्ती की स्पष्ट तस्वीर अपलोड करें।',
+      'Healthy Plant': 'स्वस्थ पौधा',
+      'Pathogen Taxonomy:': 'रोगजनक वर्गीकरण:',
+      'Plant leaf analysis': 'पत्ती विश्लेषण',
+      'Image Needs Review': 'तस्वीर की दोबारा जाँच आवश्यक',
+      'Disease model unavailable': 'रोग मॉडल उपलब्ध नहीं',
+      'Next step:': 'अगला कदम:',
+      'Service notice:': 'सेवा सूचना:',
+      'Result:': 'परिणाम:',
+      'None': 'कोई नहीं',
+      '0 Records': '0 रिकॉर्ड',
+      'Guest Session': 'अतिथि सत्र',
+      'Authenticated Farmer': 'प्रमाणित किसान',
+      'Switch': 'बदलें',
+      'Not Set': 'सेट नहीं है',
+      'Farm profile updated successfully in SQLite database!': 'खेत की प्रोफ़ाइल SQLite डेटाबेस में सफलतापूर्वक अपडेट हुई!',
+      'You have been signed out. Switched to Guest Mode.': 'आप साइन आउट हो गए हैं। अतिथि मोड चालू है।',
+      'Signed out locally, but the server could not revoke this token. It may remain valid until it expires.': 'स्थानीय रूप से साइन आउट हुआ, लेकिन सर्वर टोकन रद्द नहीं कर सका। यह समाप्ति तक मान्य रह सकता है।',
+      'Please fill out all 7 soil and meteorological numerical fields.': 'मिट्टी और मौसम के सभी 7 संख्यात्मक मान दर्ज करें।',
+      'Running Random Forest Model...': 'Random Forest मॉडल चल रहा है...',
+      'Generating Agro-Climatic Guidance...': 'कृषि-जलवायु मार्गदर्शन तैयार हो रहा है...',
+      'Agro-climatic guidance saved to your history.': 'कृषि-जलवायु मार्गदर्शन आपके इतिहास में सहेजा गया।',
+      'Please select a valid image file (JPG, PNG, WEBP).': 'कृपया मान्य तस्वीर फ़ाइल चुनें (JPG, PNG, WEBP)।',
+      'File size exceeds the 10 MB limit.': 'फ़ाइल का आकार 10 MB की सीमा से अधिक है।',
+      'Preprocessing & Evaluating...': 'प्री-प्रोसेसिंग और मूल्यांकन जारी है...',
+      'Foliar image evaluated and saved to your history!': 'पत्ती की तस्वीर का मूल्यांकन करके इतिहास में सहेजा गया!',
+      'Failed to load disease details': 'रोग का विवरण लोड नहीं हो सका',
+      'Record deleted successfully from database': 'रिकॉर्ड डेटाबेस से सफलतापूर्वक हटाया गया',
+      'Are you sure you want to delete this prediction record from the database?': 'क्या आप वाकई इस भविष्यवाणी रिकॉर्ड को डेटाबेस से हटाना चाहते हैं?',
+      'Your username or email': 'आपका उपयोगकर्ता नाम या ईमेल',
+      'At least 6 characters': 'कम से कम 6 अक्षर',
+      'Min 6 characters': 'कम से कम 6 अक्षर',
+      'Re-enter password': 'पासवर्ड फिर से दर्ज करें',
+      'Search crops, diseases, dates...': 'फसल, रोग या तारीख खोजें...',
+      'e.g. Ranchi, Jharkhand': 'उदाहरण: Ranchi, Jharkhand',
+      'e.g. Rice, Wheat': 'उदाहरण: Rice, Wheat',
+      'e.g. farmer_anil': 'उदाहरण: farmer_anil',
+      'e.g. Anil Kumar': 'उदाहरण: Anil Kumar',
+      'e.g. Rishav Kumar': 'उदाहरण: Rishav Kumar',
+      'e.g. anil@farm.in': 'उदाहरण: anil@farm.in',
+      'e.g. +91 98765 43210': 'उदाहरण: +91 98765 43210',
+      'e.g. 202': 'उदाहरण: 202',
+      'e.g. 28.5': 'उदाहरण: 28.5',
+      'e.g. 3.5': 'उदाहरण: 3.5',
+      'e.g. 42': 'उदाहरण: 42',
+      'e.g. 43': 'उदाहरण: 43',
+      'e.g. 6.5': 'उदाहरण: 6.5',
+      'e.g. 72': 'उदाहरण: 72',
+      'e.g. 90': 'उदाहरण: 90'
+    };
+    const textTranslationState = new WeakMap();
+    const attributeTranslationState = new WeakMap();
+    let activeLanguage = 'en';
+    let translatingDom = false;
+
+    function translateText(value) {
+      const source = String(value || '');
+      const trimmed = source.trim();
+      if (activeLanguage !== 'hi' || !trimmed) return source;
+      const translated = translations[trimmed];
+      if (translated) return source.replace(trimmed, translated);
+      const dynamicPatterns = [
+        [/^(\d+) Field Records$/, '$1 खेत रिकॉर्ड'],
+        [/^(\d+) Records$/, '$1 रिकॉर्ड'],
+        [/^(\d+) Crops · (\d+) Scans$/, '$1 फसलें · $2 स्कैन'],
+        [/^(\d+(?:\.\d+)?) Hectares Landholding$/, '$1 हेक्टेयर भूमि'],
+        [/^(\d+) records?$/, '$1 रिकॉर्ड'],
+        [/^Demo Login: (.+) \(1-Click\)$/, 'डेमो साइन इन: $1 (एक क्लिक)'],
+        [/^Based on your (\d+) registered field prediction\(s\), your average soil pH is ([\d.]+)\. Your soil is acidic \(pH < 6\.0\); consider applying agricultural lime or dolomite\. Average nitrogen is ([\d.]+) kg\/ha and seasonal rainfall is ([\d.]+) mm\.$/, 'आपके $1 खेत रिकॉर्ड के आधार पर, मिट्टी का औसत pH $2 है। मिट्टी अम्लीय है (pH < 6.0); कृषि चूना या डोलोमाइट डालने पर विचार करें। औसत नाइट्रोजन $3 किग्रा/हेक्टेयर और मौसमी वर्षा $4 मिमी है।'],
+        [/^Based on your (\d+) registered field prediction\(s\), your average soil pH is ([\d.]+)\. Your soil is alkaline \(pH > 7\.5\); consider applying gypsum and organic compost\. Average nitrogen is ([\d.]+) kg\/ha and seasonal rainfall is ([\d.]+) mm\.$/, 'आपके $1 खेत रिकॉर्ड के आधार पर, मिट्टी का औसत pH $2 है। मिट्टी क्षारीय है (pH > 7.5); जिप्सम और जैविक खाद डालने पर विचार करें। औसत नाइट्रोजन $3 किग्रा/हेक्टेयर और मौसमी वर्षा $4 मिमी है।'],
+        [/^Based on your (\d+) registered field prediction\(s\), your average soil pH is ([\d.]+)\. Your soil pH is optimal and neutral \(6\.5–7\.5\), providing excellent nutrient bioavailability for both cereal and legume rotations\. Average nitrogen is ([\d.]+) kg\/ha and seasonal rainfall is ([\d.]+) mm\.$/, 'आपके $1 खेत रिकॉर्ड के आधार पर, मिट्टी का औसत pH $2 है। मिट्टी का pH उपयुक्त और तटस्थ (6.5–7.5) है, जिससे अनाज और दलहन दोनों को पोषक तत्व आसानी से मिलते हैं। औसत नाइट्रोजन $3 किग्रा/हेक्टेयर और मौसमी वर्षा $4 मिमी है।']
+      ];
+      for (const [pattern, replacement] of dynamicPatterns) {
+        if (pattern.test(trimmed)) return source.replace(trimmed, trimmed.replace(pattern, replacement));
+      }
+      return source;
+    }
+
+    function translateMessage(message) {
+      const text = String(message);
+      if (activeLanguage !== 'hi') return text;
+      const exact = translations[text];
+      if (exact) return exact;
+      const patterns = [
+        [/^Demo login: (.+)$/, 'डेमो साइन इन: $1'],
+        [/^Welcome back, (.+)! Signed in with demo profile\.$/, 'वापसी पर स्वागत है, $1! डेमो प्रोफ़ाइल से साइन इन किया गया।'],
+        [/^Welcome back, (.+)!$/, 'वापसी पर स्वागत है, $1!'],
+        [/^Account created successfully! Welcome, (.+)\.$/, 'खाता सफलतापूर्वक बनाया गया! स्वागत है, $1।'],
+        [/^Success: Recommended (.+) \((.+)% model probability score\)\. Saved to database!$/, 'सफलता: सुझाई गई फसल $1 (मॉडल संभावना स्कोर $2%)। डेटाबेस में सहेजा गया!'],
+        [/^Recommendation: (.+) \((.+)% model probability score\)\. Record not saved to database(.*)$/, 'सुझाव: $1 (मॉडल संभावना स्कोर $2%)। रिकॉर्ड डेटाबेस में सहेजा नहीं गया$3'],
+        [/^Guidance generated but not saved to the database(.*)$/, 'मार्गदर्शन तैयार हुआ, लेकिन डेटाबेस में सहेजा नहीं गया$1'],
+        [/^Foliar diagnosis complete\. \(Note: Record not saved to database(.*)\)$/, 'पत्ती का निदान पूरा हुआ। (ध्यान दें: रिकॉर्ड डेटाबेस में सहेजा नहीं गया$1)'],
+        [/^Loaded (.+) agronomic benchmark values into form\\.$/, '$1 के कृषि मानक मान फ़ॉर्म में भरे गए।'],
+        [/^Autofilled climate for (.+): (.+)°C, (.+)%, (.+)mm rainfall\\.$/, '$1 की जलवायु जानकारी भरी गई: $2°C, $3%, वर्षा $4 मिमी।'],
+        [/^Loading benchmark image: (.+)\.\.\.$/, 'नमूना तस्वीर लोड हो रही है: $1...'],
+        [/^Prediction error: (.+)$/, 'भविष्यवाणी त्रुटि: $1'],
+        [/^Analysis failed: (.+)$/, 'विश्लेषण विफल: $1'],
+        [/^Guidance failed: (.+)$/, 'मार्गदर्शन विफल: $1'],
+        [/^Demo login: (.+)$/, 'डेमो साइन इन: $1'],
+        [/^Failed to load sample image: (.+)$/, 'नमूना तस्वीर लोड नहीं हुई: $1'],
+        [/^Loaded (.+)\. Click "Diagnose Foliage" to analyze!$/, '$1 लोड हुई। विश्लेषण के लिए "पत्तियों का निदान करें" क्लिक करें!']
+      ];
+      for (const [pattern, replacement] of patterns) {
+        if (pattern.test(text)) return text.replace(pattern, replacement);
+      }
+      return text;
+    }
+
+    function localizeNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (!node.nodeValue.trim()) return;
+        const state = textTranslationState.get(node) || { original: node.nodeValue, translated: node.nodeValue };
+        if (node.nodeValue !== state.translated) state.original = node.nodeValue;
+        const translated = translateText(state.original);
+        state.translated = translated;
+        textTranslationState.set(node, state);
+        if (node.nodeValue !== translated) node.nodeValue = translated;
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE || ['SCRIPT', 'STYLE'].includes(node.tagName)) return;
+      ['placeholder', 'title', 'aria-label'].forEach(attribute => {
+        if (!node.hasAttribute(attribute)) return;
+        let state = attributeTranslationState.get(node);
+        if (!state) {
+          state = {};
+          attributeTranslationState.set(node, state);
+        }
+        const current = node.getAttribute(attribute);
+        const previous = state[attribute];
+        const original = previous && current === previous.translated ? previous.original : current;
+        const translated = translateText(original);
+        state[attribute] = { original, translated };
+        if (current !== translated) node.setAttribute(attribute, translated);
+      });
+      Array.from(node.childNodes).forEach(localizeNode);
+    }
+
+    function applyLanguage(language) {
+      activeLanguage = language === 'hi' ? 'hi' : 'en';
+      document.documentElement.lang = activeLanguage;
+      document.title = activeLanguage === 'hi'
+        ? 'कृषिVision — फसल सुझाव और पौधों के रोगों की पहचान'
+        : 'कृषिVision — Intelligent Crop Recommendation and Plant Disease Detection';
+      translatingDom = true;
+      localizeNode(document.body);
+      translatingDom = false;
+      updateDashboardGreeting();
+      const selector = document.getElementById('language-preference');
+      if (selector) selector.value = activeLanguage;
+      document.querySelectorAll('input[name="theme-preference"]').forEach(input => {
+        input.checked = (localStorage.getItem(preferenceKeys.theme) || 'system') === input.value;
+      });
+      renderSettingsAccount(currentUser);
+    }
+
+    function applyTheme(theme) {
+      const preference = ['light', 'dark', 'system'].includes(theme) ? theme : 'system';
+      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const resolvedTheme = preference === 'system' ? (systemDark ? 'dark' : 'light') : preference;
+      document.documentElement.dataset.theme = resolvedTheme;
+      document.documentElement.dataset.themePreference = preference;
+      document.querySelectorAll('input[name="theme-preference"]').forEach(input => {
+        input.checked = input.value === preference;
+      });
+    }
+
+    function initializePreferences() {
+      const language = localStorage.getItem(preferenceKeys.language) || 'en';
+      const theme = localStorage.getItem(preferenceKeys.theme) || 'system';
+      applyTheme(theme);
+      applyLanguage(language);
+      if (window.matchMedia) {
+        const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const updateSystemTheme = () => {
+          if ((localStorage.getItem(preferenceKeys.theme) || 'system') === 'system') applyTheme('system');
+        };
+        if (colorScheme.addEventListener) colorScheme.addEventListener('change', updateSystemTheme);
+        else if (colorScheme.addListener) colorScheme.addListener(updateSystemTheme);
+      }
+      const observer = new MutationObserver(records => {
+        if (translatingDom) return;
+        records.forEach(record => {
+          if (record.type === 'characterData') localizeNode(record.target);
+          record.addedNodes && record.addedNodes.forEach(localizeNode);
+        });
+      });
+      observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+    }
+
+    function setThemePreference(theme) {
+      localStorage.setItem(preferenceKeys.theme, theme);
+      applyTheme(theme);
+    }
+
+    function setLanguagePreference(language) {
+      activeLanguage = language === 'hi' ? 'hi' : 'en';
+      localStorage.setItem(preferenceKeys.language, activeLanguage);
+      applyLanguage(activeLanguage);
+      notify('Preferences saved on this device.', 'success');
+    }
+
+    function savePreferences() {
+      localStorage.setItem(preferenceKeys.theme, document.documentElement.dataset.themePreference || 'system');
+      localStorage.setItem(preferenceKeys.language, activeLanguage);
+      notify('Preferences saved on this device.', 'success');
+    }
+
+    function resetPreferences() {
+      if (!confirm(translateText('Reset appearance and language to their defaults? Account data and prediction history will not be changed.'))) return;
+      localStorage.removeItem(preferenceKeys.theme);
+      localStorage.removeItem(preferenceKeys.language);
+      applyTheme('system');
+      applyLanguage('en');
+      notify('Preferences reset to defaults.', 'success');
+    }
+
+    function renderSettingsAccount(user) {
+      const container = document.getElementById('settings-account-details');
+      if (!container) return;
+      container.replaceChildren();
+      if (!user) {
+        const message = document.createElement('p');
+        message.className = 'text-slate-500';
+        message.textContent = translateText('Sign in to view your account profile.');
+        container.appendChild(message);
+        return;
+      }
+      [
+        ['Name', user.full_name || user.username],
+        ['Username', user.username],
+        ['Email', user.email],
+        ['Farm Location', user.farm_location || translateText('Not Set')],
+        ['Landholding', user.farm_size_hectares ? `${user.farm_size_hectares} ha` : translateText('Not Set')],
+        ['Phone', user.phone_number || translateText('Not Set')]
+      ].forEach(([label, value]) => {
+        const row = document.createElement('div');
+        row.className = 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-slate-100 pb-2';
+        const name = document.createElement('span');
+        name.className = 'text-xs text-slate-500';
+        name.textContent = `${translateText(label)}:`;
+        const content = document.createElement('span');
+        content.className = 'text-sm font-semibold text-slate-800 break-all';
+        content.textContent = value || '—';
+        row.append(name, content);
+        container.appendChild(row);
+      });
+    }
 
     function formatIndianTimestamp(value) {
       if (!value) return 'Date unavailable';
@@ -1034,7 +1695,7 @@
       const parsed = new Date(hasTimezone ? timestamp : `${timestamp}Z`);
       if (Number.isNaN(parsed.getTime())) return 'Date unavailable';
 
-      return new Intl.DateTimeFormat('en-IN', {
+      return new Intl.DateTimeFormat(activeLanguage === 'hi' ? 'hi-IN' : 'en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -1046,6 +1707,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      initializePreferences();
       lucide.createIcons();
       initApp();
     });
@@ -1062,6 +1724,7 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
+      if (tabName === 'settings') renderSettingsAccount(currentUser);
       if (tabName === 'history') loadHistoryData();
       if (tabName === 'analytics') loadAnalyticsData();
       if (tabName === 'dashboard') loadDashboardData();
@@ -2084,10 +2747,7 @@
     // ---------------- DASHBOARD DATA ----------------
     async function loadDashboardData() {
       // Dynamic Greeting
-      const hour = new Date().getHours();
-      const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-      const name = currentUser ? (currentUser.full_name || currentUser.username) : 'Farmer';
-      document.getElementById('dash-greeting-text').textContent = `${timeGreeting}, ${name} — welcome to`;
+      updateDashboardGreeting();
 
       // Update location KPI
       if (currentUser) {
@@ -2146,9 +2806,18 @@
             lucide.createIcons();
           }
         }
+
       } catch (e) {
         console.warn('Dashboard activity error:', e);
       }
+    }
+
+    function updateDashboardGreeting() {
+      const hour = new Date().getHours();
+      const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      const name = currentUser ? (currentUser.full_name || currentUser.username) : 'Farmer';
+      const welcome = activeLanguage === 'hi' ? 'आपका स्वागत है' : 'welcome to';
+      document.getElementById('dash-greeting-text').textContent = `${translateText(timeGreeting)}, ${name} — ${welcome}`;
     }
 
     // ---------------- FARMER PROFILE ----------------
@@ -2330,6 +2999,7 @@
 
     async function updateUserUI(user) {
       const btnLogout = document.getElementById('btn-logout');
+      renderSettingsAccount(user);
       if (!user) {
         document.getElementById('user-avatar-initials').textContent = 'GM';
         document.getElementById('user-display-name').textContent = 'Guest Farmer';
@@ -2555,7 +3225,7 @@
         toastIcon.dataset.lucide = iconName;
         toastIcon.className = 'w-4 h-4 shrink-0 text-emerald-400';
         const toastMessage = document.createElement('span');
-        toastMessage.textContent = String(message);
+        setLocalizedText(toastMessage, message);
         toastContent.append(toastIcon, toastMessage);
 
         const dismissButton = document.createElement('button');
@@ -2588,12 +3258,22 @@
         bannerIcon.dataset.lucide = iconName;
         bannerIcon.className = 'w-5 h-5 shrink-0';
         const bannerMessage = document.createElement('span');
-        bannerMessage.textContent = String(message);
+        setLocalizedText(bannerMessage, message);
         content.append(bannerIcon, bannerMessage);
         banner.classList.remove('hidden');
         lucide.createIcons();
         setTimeout(() => { banner.classList.add('hidden'); }, 6000);
       }
+    }
+
+    function setLocalizedText(element, source) {
+      const original = String(source);
+      element.textContent = original;
+      const textNode = element.firstChild;
+      if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
+      const translated = translateMessage(original);
+      textTranslationState.set(textNode, { original, translated });
+      if (translated !== original) textNode.nodeValue = translated;
     }
 
     function dismissStatusBanner() {
